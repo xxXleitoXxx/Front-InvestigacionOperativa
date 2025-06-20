@@ -5,6 +5,7 @@ import AbmAlumno from "../pages/AbmAlumno";
 import PaginaPrincipal from "../pages/Main";
 import PaginaProps from "../pages/PaginaProps";
 import ProveedorTable from "../components/ProveedorTable/ProveedorTable";
+import ArticuloTable from "../components/ArticuloTable/ArticuloTable";
 
 function Aplicacion() {
   return (
@@ -16,6 +17,7 @@ function Aplicacion() {
           <Route path="altaalumno" element={<AltaAlumno />} />
           <Route path="paginaProps" element={<PaginaProps />} />
           <Route path="abmprueba" element={<ProveedorTable />} />
+          <Route path="maestroArticulos" element={<ArticuloTable />} />
         </Routes>
       </div>
     </div>
