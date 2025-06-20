@@ -98,7 +98,6 @@ const ArticuloTable = () => {
               <th>nomArt</th>
               <th>precioVenta</th>
               <th>descripcionArt</th>
-              <th>fechaHoraBajaArt</th>
               <th>stock</th>
               <th>stockSeguridad</th>
               <th>costoGeneralInventario</th>
@@ -107,6 +106,7 @@ const ArticuloTable = () => {
               <th>inventarioMaximo</th>
               <th>tipoLote</th>
               <th>proveedorElegido</th>
+              <th>fechaHoraBajaArt</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -119,10 +119,8 @@ const ArticuloTable = () => {
                 <td>{art.nomArt}</td>
                 <td>{art.precioVenta}</td>
                 <td>{art.descripcionArt}</td>
-                <td>
-                  {art.fechaHoraBajaArt ? String(art.fechaHoraBajaArt) : ""}
-                </td>
                 <td>{art.stock}</td>
+
                 <td>{art.stockSeguridad}</td>
                 <td>{art.costoGeneralInventario}</td>
                 <td>{art.loteOptimo}</td>
@@ -131,8 +129,10 @@ const ArticuloTable = () => {
                 <td>{art.tipoLote ? art.tipoLote : ""}</td>
                 <td>
                   {art.proveedorElegido ? art.proveedorElegido.nomProv : ""}
-                </td>{" "}
-                {/* Asumiendo que `Proveedor` tiene una propiedad `nomProv` */}
+                </td>
+                <td>
+                  {art.fechaHoraBajaArt ? String(art.fechaHoraBajaArt) : ""}
+                </td>
                 <td>
                   <EditButton
                     onClick={() =>

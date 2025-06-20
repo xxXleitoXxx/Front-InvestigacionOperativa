@@ -54,7 +54,11 @@ const ProveedorModal = ({
       refreshData((prevState) => !prevState);
     } catch (error) {
       console.error(error);
-      toast.error("Ha ocurrido un error");
+      toast.error(
+        `Ha ocurrido un error: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   };
   //Delete
@@ -83,7 +87,11 @@ const ProveedorModal = ({
       refreshData((prevState) => !prevState);
     } catch (error) {
       console.error(error);
-      toast.error("Ha ocurrido un error");
+      toast.error(
+        `Ha ocurrido un error: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   };
   const validationSchema = Yup.object().shape({
@@ -91,12 +99,11 @@ const ProveedorModal = ({
     codArt: Yup.string().required("El código del artículo es requerido"),
     nomArt: Yup.string().required("El nombre del artículo es requerido"),
     precioVenta: Yup.number()
-      .min(0, "El precio de venta debe ser al menos 0")
+      .positive("El precio de venta debe ser un numero mayor a 0")
       .required("El precio de venta es requerido"),
     descripcionArt: Yup.string().required(
       "La descripción del artículo es requerida"
     ),
-    fechaHoraBajaArt: Yup.date().nullable().default(null),
 
     // Atributos para cálculo de inventario
     stock: Yup.number()
@@ -256,32 +263,6 @@ const ProveedorModal = ({
                     {formik.errors.descripcionArt}
                   </Form.Control.Feedback>
                 </Form.Group>
-
-                {/* Campo "fechaHoraBajaArt" */}
-                <Form.Group controlId="formFechaHoraBajaArt">
-                  <Form.Label>Fecha de Baja del Artículo</Form.Label>
-                  <Form.Control
-                    name="fechaHoraBajaArt"
-                    type="datetime-local"
-                    value={
-                      formik.values.fechaHoraBajaArt
-                        ? new Date(formik.values.fechaHoraBajaArt)
-                            .toISOString()
-                            .slice(0, 16)
-                        : ""
-                    }
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    isInvalid={Boolean(
-                      formik.errors.fechaHoraBajaArt &&
-                        formik.touched.fechaHoraBajaArt
-                    )}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.fechaHoraBajaArt}
-                  </Form.Control.Feedback>
-                </Form.Group>
-
                 <Modal.Footer>
                   <Button variant="secondary" onClick={onHide}>
                     Cancelar

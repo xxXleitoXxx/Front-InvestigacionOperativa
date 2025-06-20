@@ -58,7 +58,7 @@ const ProveedorModal = ({
       onHide();
       refreshData((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.error(error)
       toast.error("Ha ocurrido un error");
     }
   };
