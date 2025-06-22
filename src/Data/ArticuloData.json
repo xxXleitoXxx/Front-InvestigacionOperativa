@@ -1,0 +1,924 @@
+{
+  "articulos": [
+    {
+      "id": 1,
+      "codArt": "ART001",
+      "nomArt": "Artículo Uno",
+      "precioVenta": 10.99,
+      "descripcionArt": "Descripción del Artículo Uno",
+      "fechaHoraBajaArt": null,
+      "stock": 100,
+      "stockSeguridad": 10,
+      "costoGeneralInventario": 5.50,
+      "loteOptimo": 50,
+      "puntoPedido": 20,
+      "inventarioMaximo": 200,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 1,
+        "codProv": "PROV001",
+        "nomProv": "Proveedor Uno",
+        "descripcionProv": "Descripción del Proveedor Uno",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 1,
+            "articulo": {
+              "id": 1,
+              "codArt": "ART001",
+              "nomArt": "Artículo Uno",
+              "precioVenta": 10.99,
+              "descripcionArt": "Descripción del Artículo Uno",
+              "fechaHoraBajaArt": null,
+              "stock": 100,
+              "stockSeguridad": 10,
+              "costoGeneralInventario": 5.50,
+              "loteOptimo": 50,
+              "puntoPedido": 20,
+              "inventarioMaximo": 200,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 8.99,
+            "demoraEntrega": 2,
+            "costoPedido": 1.50
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "codArt": "ART002",
+      "nomArt": "Artículo Dos",
+      "precioVenta": 20.50,
+      "descripcionArt": "Descripción del Artículo Dos",
+      "fechaHoraBajaArt": null,
+      "stock": 50,
+      "stockSeguridad": 5,
+      "costoGeneralInventario": 10.25,
+      "loteOptimo": 30,
+      "puntoPedido": 10,
+      "inventarioMaximo": 150,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 2,
+        "codProv": "PROV002",
+        "nomProv": "Proveedor Dos",
+        "descripcionProv": "Descripción del Proveedor Dos",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 2,
+            "articulo": {
+              "id": 2,
+              "codArt": "ART002",
+              "nomArt": "Artículo Dos",
+              "precioVenta": 20.50,
+              "descripcionArt": "Descripción del Artículo Dos",
+              "fechaHoraBajaArt": null,
+              "stock": 50,
+              "stockSeguridad": 5,
+              "costoGeneralInventario": 10.25,
+              "loteOptimo": 30,
+              "puntoPedido": 10,
+              "inventarioMaximo": 150,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 15.99,
+            "demoraEntrega": 3,
+            "costoPedido": 2.00
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "codArt": "ART003",
+      "nomArt": "Artículo Tres",
+      "precioVenta": 15.75,
+      "descripcionArt": "Descripción del Artículo Tres",
+      "fechaHoraBajaArt": null,
+      "stock": 75,
+      "stockSeguridad": 8,
+      "costoGeneralInventario": 7.80,
+      "loteOptimo": 40,
+      "puntoPedido": 15,
+      "inventarioMaximo": 180,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 3,
+        "codProv": "PROV003",
+        "nomProv": "Proveedor Tres",
+        "descripcionProv": "Descripción del Proveedor Tres",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 3,
+            "articulo": {
+              "id": 3,
+              "codArt": "ART003",
+              "nomArt": "Artículo Tres",
+              "precioVenta": 15.75,
+              "descripcionArt": "Descripción del Artículo Tres",
+              "fechaHoraBajaArt": null,
+              "stock": 75,
+              "stockSeguridad": 8,
+              "costoGeneralInventario": 7.80,
+              "loteOptimo": 40,
+              "puntoPedido": 15,
+              "inventarioMaximo": 180,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 12.50,
+            "demoraEntrega": 4,
+            "costoPedido": 1.75
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "codArt": "ART004",
+      "nomArt": "Artículo Cuatro",
+      "precioVenta": 25.30,
+      "descripcionArt": "Descripción del Artículo Cuatro",
+      "fechaHoraBajaArt": null,
+      "stock": 60,
+      "stockSeguridad": 6,
+      "costoGeneralInventario": 12.65,
+      "loteOptimo": 35,
+      "puntoPedido": 12,
+      "inventarioMaximo": 170,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 4,
+        "codProv": "PROV004",
+        "nomProv": "Proveedor Cuatro",
+        "descripcionProv": "Descripción del Proveedor Cuatro",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 4,
+            "articulo": {
+              "id": 4,
+              "codArt": "ART004",
+              "nomArt": "Artículo Cuatro",
+              "precioVenta": 25.30,
+              "descripcionArt": "Descripción del Artículo Cuatro",
+              "fechaHoraBajaArt": null,
+              "stock": 60,
+              "stockSeguridad": 6,
+              "costoGeneralInventario": 12.65,
+              "loteOptimo": 35,
+              "puntoPedido": 12,
+              "inventarioMaximo": 170,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 20.25,
+            "demoraEntrega": 5,
+            "costoPedido": 2.25
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "codArt": "ART005",
+      "nomArt": "Artículo Cinco",
+      "precioVenta": 18.99,
+      "descripcionArt": "Descripción del Artículo Cinco",
+      "fechaHoraBajaArt": null,
+      "stock": 80,
+      "stockSeguridad": 9,
+      "costoGeneralInventario": 9.50,
+      "loteOptimo": 45,
+      "puntoPedido": 18,
+      "inventarioMaximo": 190,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 5,
+        "codProv": "PROV005",
+        "nomProv": "Proveedor Cinco",
+        "descripcionProv": "Descripción del Proveedor Cinco",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 5,
+            "articulo": {
+              "id": 5,
+              "codArt": "ART005",
+              "nomArt": "Artículo Cinco",
+              "precioVenta": 18.99,
+              "descripcionArt": "Descripción del Artículo Cinco",
+              "fechaHoraBajaArt": null,
+              "stock": 80,
+              "stockSeguridad": 9,
+              "costoGeneralInventario": 9.50,
+              "loteOptimo": 45,
+              "puntoPedido": 18,
+              "inventarioMaximo": 190,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 15.20,
+            "demoraEntrega": 3,
+            "costoPedido": 1.80
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "codArt": "ART006",
+      "nomArt": "Artículo Seis",
+      "precioVenta": 14.99,
+      "descripcionArt": "Descripción del Artículo Seis",
+      "fechaHoraBajaArt": null,
+      "stock": 90,
+      "stockSeguridad": 10,
+      "costoGeneralInventario": 7.50,
+      "loteOptimo": 40,
+      "puntoPedido": 20,
+      "inventarioMaximo": 200,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 6,
+        "codProv": "PROV006",
+        "nomProv": "Proveedor Seis",
+        "descripcionProv": "Descripción del Proveedor Seis",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 6,
+            "articulo": {
+              "id": 6,
+              "codArt": "ART006",
+              "nomArt": "Artículo Seis",
+              "precioVenta": 14.99,
+              "descripcionArt": "Descripción del Artículo Seis",
+              "fechaHoraBajaArt": null,
+              "stock": 90,
+              "stockSeguridad": 10,
+              "costoGeneralInventario": 7.50,
+              "loteOptimo": 40,
+              "puntoPedido": 20,
+              "inventarioMaximo": 200,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 12.00,
+            "demoraEntrega": 4,
+            "costoPedido": 1.90
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "codArt": "ART007",
+      "nomArt": "Artículo Siete",
+      "precioVenta": 22.50,
+      "descripcionArt": "Descripción del Artículo Siete",
+      "fechaHoraBajaArt": null,
+      "stock": 65,
+      "stockSeguridad": 7,
+      "costoGeneralInventario": 11.25,
+      "loteOptimo": 30,
+      "puntoPedido": 14,
+      "inventarioMaximo": 160,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 7,
+        "codProv": "PROV007",
+        "nomProv": "Proveedor Siete",
+        "descripcionProv": "Descripción del Proveedor Siete",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 7,
+            "articulo": {
+              "id": 7,
+              "codArt": "ART007",
+              "nomArt": "Artículo Siete",
+              "precioVenta": 22.50,
+              "descripcionArt": "Descripción del Artículo Siete",
+              "fechaHoraBajaArt": null,
+              "stock": 65,
+              "stockSeguridad": 7,
+              "costoGeneralInventario": 11.25,
+              "loteOptimo": 30,
+              "puntoPedido": 14,
+              "inventarioMaximo": 160,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 18.00,
+            "demoraEntrega": 2,
+            "costoPedido": 2.10
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "codArt": "ART008",
+      "nomArt": "Artículo Ocho",
+      "precioVenta": 17.99,
+      "descripcionArt": "Descripción del Artículo Ocho",
+      "fechaHoraBajaArt": null,
+      "stock": 70,
+      "stockSeguridad": 8,
+      "costoGeneralInventario": 9.00,
+      "loteOptimo": 35,
+      "puntoPedido": 16,
+      "inventarioMaximo": 175,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 8,
+        "codProv": "PROV008",
+        "nomProv": "Proveedor Ocho",
+        "descripcionProv": "Descripción del Proveedor Ocho",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 8,
+            "articulo": {
+              "id": 8,
+              "codArt": "ART008",
+              "nomArt": "Artículo Ocho",
+              "precioVenta": 17.99,
+              "descripcionArt": "Descripción del Artículo Ocho",
+              "fechaHoraBajaArt": null,
+              "stock": 70,
+              "stockSeguridad": 8,
+              "costoGeneralInventario": 9.00,
+              "loteOptimo": 35,
+              "puntoPedido": 16,
+              "inventarioMaximo": 175,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 14.40,
+            "demoraEntrega": 3,
+            "costoPedido": 2.00
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "codArt": "ART009",
+      "nomArt": "Artículo Nueve",
+      "precioVenta": 19.99,
+      "descripcionArt": "Descripción del Artículo Nueve",
+      "fechaHoraBajaArt": null,
+      "stock": 85,
+      "stockSeguridad": 9,
+      "costoGeneralInventario": 10.00,
+      "loteOptimo": 45,
+      "puntoPedido": 17,
+      "inventarioMaximo": 185,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 9,
+        "codProv": "PROV009",
+        "nomProv": "Proveedor Nueve",
+        "descripcionProv": "Descripción del Proveedor Nueve",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 9,
+            "articulo": {
+              "id": 9,
+              "codArt": "ART009",
+              "nomArt": "Artículo Nueve",
+              "precioVenta": 19.99,
+              "descripcionArt": "Descripción del Artículo Nueve",
+              "fechaHoraBajaArt": null,
+              "stock": 85,
+              "stockSeguridad": 9,
+              "costoGeneralInventario": 10.00,
+              "loteOptimo": 45,
+              "puntoPedido": 17,
+              "inventarioMaximo": 185,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 15.99,
+            "demoraEntrega": 4,
+            "costoPedido": 1.75
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "codArt": "ART010",
+      "nomArt": "Artículo Diez",
+      "precioVenta": 24.99,
+      "descripcionArt": "Descripción del Artículo Diez",
+      "fechaHoraBajaArt": null,
+      "stock": 55,
+      "stockSeguridad": 6,
+      "costoGeneralInventario": 12.50,
+      "loteOptimo": 25,
+      "puntoPedido": 13,
+      "inventarioMaximo": 155,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 10,
+        "codProv": "PROV010",
+        "nomProv": "Proveedor Diez",
+        "descripcionProv": "Descripción del Proveedor Diez",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 10,
+            "articulo": {
+              "id": 10,
+              "codArt": "ART010",
+              "nomArt": "Artículo Diez",
+              "precioVenta": 24.99,
+              "descripcionArt": "Descripción del Artículo Diez",
+              "fechaHoraBajaArt": null,
+              "stock": 55,
+              "stockSeguridad": 6,
+              "costoGeneralInventario": 12.50,
+              "loteOptimo": 25,
+              "puntoPedido": 13,
+              "inventarioMaximo": 155,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 20.00,
+            "demoraEntrega": 5,
+            "costoPedido": 2.25
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "codArt": "ART011",
+      "nomArt": "Artículo Once",
+      "precioVenta": 16.75,
+      "descripcionArt": "Descripción del Artículo Once",
+      "fechaHoraBajaArt": null,
+      "stock": 95,
+      "stockSeguridad": 10,
+      "costoGeneralInventario": 8.38,
+      "loteOptimo": 50,
+      "puntoPedido": 20,
+      "inventarioMaximo": 210,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 11,
+        "codProv": "PROV011",
+        "nomProv": "Proveedor Once",
+        "descripcionProv": "Descripción del Proveedor Once",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 11,
+            "articulo": {
+              "id": 11,
+              "codArt": "ART011",
+              "nomArt": "Artículo Once",
+              "precioVenta": 16.75,
+              "descripcionArt": "Descripción del Artículo Once",
+              "fechaHoraBajaArt": null,
+              "stock": 95,
+              "stockSeguridad": 10,
+              "costoGeneralInventario": 8.38,
+              "loteOptimo": 50,
+              "puntoPedido": 20,
+              "inventarioMaximo": 210,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 13.40,
+            "demoraEntrega": 2,
+            "costoPedido": 1.68
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "codArt": "ART012",
+      "nomArt": "Artículo Doce",
+      "precioVenta": 21.25,
+      "descripcionArt": "Descripción del Artículo Doce",
+      "fechaHoraBajaArt": null,
+      "stock": 60,
+      "stockSeguridad": 7,
+      "costoGeneralInventario": 10.63,
+      "loteOptimo": 30,
+      "puntoPedido": 15,
+      "inventarioMaximo": 165,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 12,
+        "codProv": "PROV012",
+        "nomProv": "Proveedor Doce",
+        "descripcionProv": "Descripción del Proveedor Doce",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 12,
+            "articulo": {
+              "id": 12,
+              "codArt": "ART012",
+              "nomArt": "Artículo Doce",
+              "precioVenta": 21.25,
+              "descripcionArt": "Descripción del Artículo Doce",
+              "fechaHoraBajaArt": null,
+              "stock": 60,
+              "stockSeguridad": 7,
+              "costoGeneralInventario": 10.63,
+              "loteOptimo": 30,
+              "puntoPedido": 15,
+              "inventarioMaximo": 165,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 17.00,
+            "demoraEntrega": 3,
+            "costoPedido": 2.13
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "codArt": "ART013",
+      "nomArt": "Artículo Trece",
+      "precioVenta": 18.50,
+      "descripcionArt": "Descripción del Artículo Trece",
+      "fechaHoraBajaArt": null,
+      "stock": 75,
+      "stockSeguridad": 8,
+      "costoGeneralInventario": 9.25,
+      "loteOptimo": 40,
+      "puntoPedido": 16,
+      "inventarioMaximo": 170,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 13,
+        "codProv": "PROV013",
+        "nomProv": "Proveedor Trece",
+        "descripcionProv": "Descripción del Proveedor Trece",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 13,
+            "articulo": {
+              "id": 13,
+              "codArt": "ART013",
+              "nomArt": "Artículo Trece",
+              "precioVenta": 18.50,
+              "descripcionArt": "Descripción del Artículo Trece",
+              "fechaHoraBajaArt": null,
+              "stock": 75,
+              "stockSeguridad": 8,
+              "costoGeneralInventario": 9.25,
+              "loteOptimo": 40,
+              "puntoPedido": 16,
+              "inventarioMaximo": 170,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 14.80,
+            "demoraEntrega": 4,
+            "costoPedido": 1.85
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "codArt": "ART014",
+      "nomArt": "Artículo Catorce",
+      "precioVenta": 23.75,
+      "descripcionArt": "Descripción del Artículo Catorce",
+      "fechaHoraBajaArt": null,
+      "stock": 50,
+      "stockSeguridad": 5,
+      "costoGeneralInventario": 11.88,
+      "loteOptimo": 25,
+      "puntoPedido": 10,
+      "inventarioMaximo": 140,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 14,
+        "codProv": "PROV014",
+        "nomProv": "Proveedor Catorce",
+        "descripcionProv": "Descripción del Proveedor Catorce",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 14,
+            "articulo": {
+              "id": 14,
+              "codArt": "ART014",
+              "nomArt": "Artículo Catorce",
+              "precioVenta": 23.75,
+              "descripcionArt": "Descripción del Artículo Catorce",
+              "fechaHoraBajaArt": null,
+              "stock": 50,
+              "stockSeguridad": 5,
+              "costoGeneralInventario": 11.88,
+              "loteOptimo": 25,
+              "puntoPedido": 10,
+              "inventarioMaximo": 140,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 19.00,
+            "demoraEntrega": 5,
+            "costoPedido": 2.38
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "codArt": "ART015",
+      "nomArt": "Artículo Quince",
+      "precioVenta": 15.25,
+      "descripcionArt": "Descripción del Artículo Quince",
+      "fechaHoraBajaArt": null,
+      "stock": 100,
+      "stockSeguridad": 10,
+      "costoGeneralInventario": 7.63,
+      "loteOptimo": 50,
+      "puntoPedido": 20,
+      "inventarioMaximo": 220,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 15,
+        "codProv": "PROV015",
+        "nomProv": "Proveedor Quince",
+        "descripcionProv": "Descripción del Proveedor Quince",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 15,
+            "articulo": {
+              "id": 15,
+              "codArt": "ART015",
+              "nomArt": "Artículo Quince",
+              "precioVenta": 15.25,
+              "descripcionArt": "Descripción del Artículo Quince",
+              "fechaHoraBajaArt": null,
+              "stock": 100,
+              "stockSeguridad": 10,
+              "costoGeneralInventario": 7.63,
+              "loteOptimo": 50,
+              "puntoPedido": 20,
+              "inventarioMaximo": 220,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 12.20,
+            "demoraEntrega": 2,
+            "costoPedido": 1.53
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "codArt": "ART016",
+      "nomArt": "Artículo Dieciséis",
+      "precioVenta": 26.00,
+      "descripcionArt": "Descripción del Artículo Dieciséis",
+      "fechaHoraBajaArt": null,
+      "stock": 45,
+      "stockSeguridad": 5,
+      "costoGeneralInventario": 13.00,
+      "loteOptimo": 20,
+      "puntoPedido": 10,
+      "inventarioMaximo": 130,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 16,
+        "codProv": "PROV016",
+        "nomProv": "Proveedor Dieciséis",
+        "descripcionProv": "Descripción del Proveedor Dieciséis",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 16,
+            "articulo": {
+              "id": 16,
+              "codArt": "ART016",
+              "nomArt": "Artículo Dieciséis",
+              "precioVenta": 26.00,
+              "descripcionArt": "Descripción del Artículo Dieciséis",
+              "fechaHoraBajaArt": null,
+              "stock": 45,
+              "stockSeguridad": 5,
+              "costoGeneralInventario": 13.00,
+              "loteOptimo": 20,
+              "puntoPedido": 10,
+              "inventarioMaximo": 130,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 20.80,
+            "demoraEntrega": 6,
+            "costoPedido": 2.60
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "codArt": "ART017",
+      "nomArt": "Artículo Diecisiete",
+      "precioVenta": 19.50,
+      "descripcionArt": "Descripción del Artículo Diecisiete",
+      "fechaHoraBajaArt": null,
+      "stock": 70,
+      "stockSeguridad": 7,
+      "costoGeneralInventario": 9.75,
+      "loteOptimo": 35,
+      "puntoPedido": 14,
+      "inventarioMaximo": 160,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 17,
+        "codProv": "PROV017",
+        "nomProv": "Proveedor Diecisiete",
+        "descripcionProv": "Descripción del Proveedor Diecisiete",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 17,
+            "articulo": {
+              "id": 17,
+              "codArt": "ART017",
+              "nomArt": "Artículo Diecisiete",
+              "precioVenta": 19.50,
+              "descripcionArt": "Descripción del Artículo Diecisiete",
+              "fechaHoraBajaArt": null,
+              "stock": 70,
+              "stockSeguridad": 7,
+              "costoGeneralInventario": 9.75,
+              "loteOptimo": 35,
+              "puntoPedido": 14,
+              "inventarioMaximo": 160,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 15.60,
+            "demoraEntrega": 3,
+            "costoPedido": 1.95
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "codArt": "ART018",
+      "nomArt": "Artículo Dieciocho",
+      "precioVenta": 22.75,
+      "descripcionArt": "Descripción del Artículo Dieciocho",
+      "fechaHoraBajaArt": null,
+      "stock": 55,
+      "stockSeguridad": 6,
+      "costoGeneralInventario": 11.38,
+      "loteOptimo": 25,
+      "puntoPedido": 13,
+      "inventarioMaximo": 145,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 18,
+        "codProv": "PROV018",
+        "nomProv": "Proveedor Dieciocho",
+        "descripcionProv": "Descripción del Proveedor Dieciocho",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 18,
+            "articulo": {
+              "id": 18,
+              "codArt": "ART018",
+              "nomArt": "Artículo Dieciocho",
+              "precioVenta": 22.75,
+              "descripcionArt": "Descripción del Artículo Dieciocho",
+              "fechaHoraBajaArt": null,
+              "stock": 55,
+              "stockSeguridad": 6,
+              "costoGeneralInventario": 11.38,
+              "loteOptimo": 25,
+              "puntoPedido": 13,
+              "inventarioMaximo": 145,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 18.20,
+            "demoraEntrega": 4,
+            "costoPedido": 2.28
+          }
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "codArt": "ART019",
+      "nomArt": "Artículo Diecinueve",
+      "precioVenta": 17.25,
+      "descripcionArt": "Descripción del Artículo Diecinueve",
+      "fechaHoraBajaArt": null,
+      "stock": 85,
+      "stockSeguridad": 9,
+      "costoGeneralInventario": 8.63,
+      "loteOptimo": 45,
+      "puntoPedido": 18,
+      "inventarioMaximo": 195,
+      "tipoLote": "LOTEFIJO",
+      "proveedorElegido": {
+        "id": 19,
+        "codProv": "PROV019",
+        "nomProv": "Proveedor Diecinueve",
+        "descripcionProv": "Descripción del Proveedor Diecinueve",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 19,
+            "articulo": {
+              "id": 19,
+              "codArt": "ART019",
+              "nomArt": "Artículo Diecinueve",
+              "precioVenta": 17.25,
+              "descripcionArt": "Descripción del Artículo Diecinueve",
+              "fechaHoraBajaArt": null,
+              "stock": 85,
+              "stockSeguridad": 9,
+              "costoGeneralInventario": 8.63,
+              "loteOptimo": 45,
+              "puntoPedido": 18,
+              "inventarioMaximo": 195,
+              "tipoLote": "LOTEFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 13.80,
+            "demoraEntrega": 2,
+            "costoPedido": 1.73
+          }
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "codArt": "ART020",
+      "nomArt": "Artículo Veinte",
+      "precioVenta": 28.00,
+      "descripcionArt": "Descripción del Artículo Veinte",
+      "fechaHoraBajaArt": null,
+      "stock": 40,
+      "stockSeguridad": 4,
+      "costoGeneralInventario": 14.00,
+      "loteOptimo": 20,
+      "puntoPedido": 8,
+      "inventarioMaximo": 120,
+      "tipoLote": "PERIODOFIJO",
+      "proveedorElegido": {
+        "id": 20,
+        "codProv": "PROV020",
+        "nomProv": "Proveedor Veinte",
+        "descripcionProv": "Descripción del Proveedor Veinte",
+        "fechaHoraBajaProv": null,
+        "proveedorArticulos": [
+          {
+            "id": 20,
+            "articulo": {
+              "id": 20,
+              "codArt": "ART020",
+              "nomArt": "Artículo Veinte",
+              "precioVenta": 28.00,
+              "descripcionArt": "Descripción del Artículo Veinte",
+              "fechaHoraBajaArt": null,
+              "stock": 40,
+              "stockSeguridad": 4,
+              "costoGeneralInventario": 14.00,
+              "loteOptimo": 20,
+              "puntoPedido": 8,
+              "inventarioMaximo": 120,
+              "tipoLote": "PERIODOFIJO",
+              "proveedorElegido": null
+            },
+            "precioArtProv": 22.40,
+            "demoraEntrega": 5,
+            "costoPedido": 2.80
+          }
+        ]
+      }
+    }
+  ]
+}

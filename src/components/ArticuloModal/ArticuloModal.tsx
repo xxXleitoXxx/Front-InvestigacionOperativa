@@ -1,41 +1,53 @@
-import {
-  Button,
-  Form,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalTitle,
-} from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
 import { ModalType } from "../../types/ModalType";
-
-//dependencia para validar Formulario
 import * as Yup from "yup";
 import { useFormik } from "formik";
-
-//notificaciones al usuario
 import { toast } from "react-toastify";
-import React from "react";
-import type { Articulo } from "../../types/Articulo";
+import { ProveedorService } from "../../services/ProveedorService";
+import type { ArticuloDTO } from "../../types/ArticuloDTO";
+import type { ProveedorDTO } from "../../types/ProveedorDTO";
 import { ArticuloService } from "../../services/ArticuloSevice";
 
 type ArticuloModalProps = {
   show: boolean;
   onHide: () => void;
-  title: String;
+  title: string;
   modalType: ModalType;
-  art: Articulo;
+  art: ArticuloDTO;
   refreshData: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const ProveedorModal = ({
+
+const ArticuloModal = ({
   show,
   onHide,
+  title,
   modalType,
   art,
-  title,
   refreshData,
 }: ArticuloModalProps) => {
-  //CREATE-UPDATE
-  const handleSaveUpdate = async (arti: Articulo) => {
+  const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
+  const [proveedorSearch, setProveedorSearch] = useState("");
+
+  useEffect(() => {
+    const fetchProveedores = async () => {
+      try {
+        const data = await ProveedorService.getProveedores();
+        setProveedores(data);
+      } catch (error) {
+        console.error("Error al obtener proveedores:", error);
+        toast.error(
+          `Error al cargar proveedores: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
+      }
+    };
+
+    fetchProveedores();
+  }, []);
+
+  const handleSaveUpdate = async (arti: ArticuloDTO) => {
     try {
       const isNew = arti.id === 0;
       if (isNew) {
@@ -44,12 +56,11 @@ const ProveedorModal = ({
         await ArticuloService.updateArticulo(arti.id, arti);
       }
       toast.success(
-        isNew ? "Articulo Creado Con Exito" : "Articulo Actualizado Con Exito",
+        isNew ? "Artículo creado con éxito" : "Artículo actualizado con éxito",
         {
           position: "top-center",
         }
       );
-
       onHide();
       refreshData((prevState) => !prevState);
     } catch (error) {
@@ -61,26 +72,11 @@ const ProveedorModal = ({
       );
     }
   };
-  //Delete
-  //Metodo Delete Fisico Deprecado
-  /*
-  const handleDelete = async () => {
-    try {
-      await ProveedorService.deleteProveedor(prov.id);
-      toast.success("Proveedor eliminado con éxito", {
-        position: "top-center",
-      });
-      onHide();
-      refreshData((prevState) => !prevState);
-    } catch (error) {
-      console.error(error);
-      toast.error("Ha ocurrido un error");
-    }
-  };*/
+
   const handleDelete = async () => {
     try {
       await ArticuloService.bajaLogicaArticulo(art.id, art);
-      toast.success("Articulo eliminado con éxito", {
+      toast.success("Artículo eliminado con éxito", {
         position: "top-center",
       });
       onHide();
@@ -94,194 +90,307 @@ const ProveedorModal = ({
       );
     }
   };
+
   const validationSchema = Yup.object().shape({
     id: Yup.number().integer().min(0).required("El ID es requerido"),
     codArt: Yup.string().required("El código del artículo es requerido"),
     nomArt: Yup.string().required("El nombre del artículo es requerido"),
     precioVenta: Yup.number()
-      .positive("El precio de venta debe ser un numero mayor a 0")
+      .positive("El precio de venta debe ser un número mayor a 0")
       .required("El precio de venta es requerido"),
-    descripcionArt: Yup.string().required(
-      "La descripción del artículo es requerida"
-    ),
-
-    // Atributos para cálculo de inventario
     stock: Yup.number()
       .integer()
       .min(0, "El stock debe ser al menos 0")
       .required("El stock es requerido"),
-    stockSeguridad: Yup.number()
-      .integer()
-      .min(0, "El stock de seguridad debe ser al menos 0")
-      .required("El stock de seguridad es requerido"),
-    costoGeneralInventario: Yup.number()
-      .min(0, "El costo general del inventario debe ser al menos 0")
-      .required("El costo general del inventario es requerido"),
-
-    // Lote fijo
-    loteOptimo: Yup.number()
-      .integer()
-      .min(0, "El lote óptimo debe ser al menos 0")
-      .required("El lote óptimo es requerido"),
-    puntoPedido: Yup.number()
-      .integer()
-      .min(0, "El punto de pedido debe ser al menos 0")
-      .required("El punto de pedido es requerido"),
-
-    // Periodo fijo
-    inventarioMaximo: Yup.number()
-      .integer()
-      .min(0, "El inventario máximo debe ser al menos 0")
-      .required("El inventario máximo es requerido"),
-    tipoLote: Yup.mixed().nullable().default(null),
-
-    // Relaciones
-    proveedorElegido: Yup.mixed().nullable().default(null),
+    demandaDiaria: Yup.number()
+      .positive("La demanda diaria debe ser mayor a cero")
+      .required("La demanda diaria es requerida"),
+    desviacionEstandarUsoPeriodoEntrega: Yup.number()
+      .positive("La desviación estándar en el uso debe ser mayor a cero")
+      .required("La desviación estándar en el uso es requerida"),
+    desviacionEstandarDurantePeriodoRevisionEntrega: Yup.number()
+      .positive(
+        "La desviación estándar durante el período de revisión debe ser mayor a cero"
+      )
+      .required(
+        "La desviación estándar durante el período de revisión es requerida"
+      ),
+    proveedorDTO: Yup.object()
+      .shape({
+        id: Yup.number(),
+      })
+      .nullable(),
   });
 
-  //formik, utiliza el esquema de validacion para crear un formulario dinámico
-  //Y que lo que bloquea el formulario en caso de haber errores
-
   const formik = useFormik({
-    initialValues: art,
+    initialValues: {
+      ...art,
+      demandaDiaria: art.demandaDiaria || 1,
+      desviacionEstandarUsoPeriodoEntrega:
+        art.desviacionEstandarUsoPeriodoEntrega || 1,
+      desviacionEstandarDurantePeriodoRevisionEntrega:
+        art.desviacionEstandarDurantePeriodoRevisionEntrega || 1,
+    },
     validationSchema: validationSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: (obj: Articulo) => handleSaveUpdate(obj),
+    onSubmit: handleSaveUpdate,
   });
+
+  const filteredProveedores = proveedores.filter((proveedor) =>
+    proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
+  );
 
   return (
     <>
       {modalType === ModalType.DELETE ? (
-        <>
-          <Modal show={show} onHide={onHide} centered backdrop="static">
-            <Modal.Header closeButton>
-              <ModalTitle>{title}</ModalTitle>
-            </Modal.Header>
-
-            <Modal.Body>
-              <p>
-                ¿Esta seguro que desea eliminar el Articulo?
-                <br />
-                <strong>{art.nomArt}</strong>
-              </p>
-            </Modal.Body>
-
-            <ModalFooter>
-              <Button variant="secondary" onClick={onHide}>
-                Cancelar
-              </Button>
-              <Button variant="secondary" onClick={handleDelete}>
-                Eliminar
-              </Button>
-            </ModalFooter>
-          </Modal>
-        </>
+        <Modal show={show} onHide={onHide} centered backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>{title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              ¿Está seguro que desea eliminar el artículo? <br />
+              <strong>{art.nomArt}</strong>
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={onHide}>
+              Cancelar
+            </Button>
+            <Button variant="danger" onClick={handleDelete}>
+              Eliminar
+            </Button>
+          </Modal.Footer>
+        </Modal>
       ) : (
-        <>
-          <Modal
-            show={show}
-            onHide={onHide}
-            centered
-            backdrop="static"
-            className="modal-x1"
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>{title}</Modal.Title>
-            </Modal.Header>
-            <ModalBody>
-              <Form onSubmit={formik.handleSubmit}>
-                {/* Campo "codArt" */}
-                <Form.Group controlId="formCodArt">
-                  <Form.Label>Código del Artículo</Form.Label>
-                  <Form.Control
-                    name="codArt"
-                    type="text"
-                    value={formik.values.codArt || ""}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    isInvalid={Boolean(
-                      formik.errors.codArt && formik.touched.codArt
-                    )}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.codArt}
-                  </Form.Control.Feedback>
-                </Form.Group>
+        <Modal
+          show={show}
+          onHide={onHide}
+          centered
+          backdrop="static"
+          className="modal-xl"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={formik.handleSubmit}>
+              <Form.Group controlId="formCodArt">
+                <Form.Label>Código del Artículo</Form.Label>
+                <Form.Control
+                  name="codArt"
+                  type="text"
+                  value={formik.values.codArt || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={!!(formik.errors.codArt && formik.touched.codArt)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.codArt}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-                {/* Campo "nomArt" */}
-                <Form.Group controlId="formNomArt">
-                  <Form.Label>Nombre del Artículo</Form.Label>
-                  <Form.Control
-                    name="nomArt"
-                    type="text"
-                    value={formik.values.nomArt || ""}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    isInvalid={Boolean(
-                      formik.errors.nomArt && formik.touched.nomArt
-                    )}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.nomArt}
-                  </Form.Control.Feedback>
-                </Form.Group>
+              <Form.Group controlId="formNomArt">
+                <Form.Label>Nombre del Artículo</Form.Label>
+                <Form.Control
+                  name="nomArt"
+                  type="text"
+                  value={formik.values.nomArt || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={!!(formik.errors.nomArt && formik.touched.nomArt)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.nomArt}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-                {/* Campo "precioVenta" */}
-                <Form.Group controlId="formPrecioVenta">
-                  <Form.Label>Precio de Venta</Form.Label>
-                  <Form.Control
-                    name="precioVenta"
-                    type="number"
-                    value={formik.values.precioVenta || ""}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    isInvalid={Boolean(
-                      formik.errors.precioVenta && formik.touched.precioVenta
-                    )}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.precioVenta}
-                  </Form.Control.Feedback>
-                </Form.Group>
+              <Form.Group controlId="formPrecioVenta">
+                <Form.Label>Precio de Venta</Form.Label>
+                <Form.Control
+                  name="precioVenta"
+                  type="number"
+                  value={formik.values.precioVenta || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={
+                    !!(formik.errors.precioVenta && formik.touched.precioVenta)
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.precioVenta}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-                {/* Campo "descripcionArt" */}
-                <Form.Group controlId="formDescripcionArt">
-                  <Form.Label>Descripción del Artículo</Form.Label>
-                  <Form.Control
-                    name="descripcionArt"
-                    type="text"
-                    value={formik.values.descripcionArt || ""}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    isInvalid={Boolean(
+              <Form.Group controlId="formDescripcionArt">
+                <Form.Label>Descripción del Artículo</Form.Label>
+                <Form.Control
+                  name="descripcionArt"
+                  type="text"
+                  value={formik.values.descripcionArt || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={
+                    !!(
                       formik.errors.descripcionArt &&
-                        formik.touched.descripcionArt
-                    )}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.descripcionArt}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={onHide}>
-                    Cancelar
-                  </Button>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    disabled={!formik.isValid}
-                  >
-                    Guardar
-                  </Button>
-                </Modal.Footer>
-              </Form>
-            </ModalBody>
-          </Modal>
-        </>
+                      formik.touched.descripcionArt
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.descripcionArt}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="formStock">
+                <Form.Label>Stock</Form.Label>
+                <Form.Control
+                  name="stock"
+                  type="number"
+                  value={formik.values.stock || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={!!(formik.errors.stock && formik.touched.stock)}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.stock}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="formDemandaDiaria">
+                <Form.Label>Demanda Diaria</Form.Label>
+                <Form.Control
+                  name="demandaDiaria"
+                  type="number"
+                  value={formik.values.demandaDiaria || ""}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={
+                    !!(
+                      formik.errors.demandaDiaria &&
+                      formik.touched.demandaDiaria
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.demandaDiaria}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="formDesviacionEstandarUsoPeriodoEntrega">
+                <Form.Label>Desviación Estándar Uso Periodo Entrega</Form.Label>
+                <Form.Control
+                  name="desviacionEstandarUsoPeriodoEntrega"
+                  type="number"
+                  value={
+                    formik.values.desviacionEstandarUsoPeriodoEntrega || ""
+                  }
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={
+                    !!(
+                      formik.errors.desviacionEstandarUsoPeriodoEntrega &&
+                      formik.touched.desviacionEstandarUsoPeriodoEntrega
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.desviacionEstandarUsoPeriodoEntrega}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="formDesviacionEstandarDurantePeriodoRevisionEntrega">
+                <Form.Label>
+                  Desviación Estándar Durante Periodo Revisión Entrega
+                </Form.Label>
+                <Form.Control
+                  name="desviacionEstandarDurantePeriodoRevisionEntrega"
+                  type="number"
+                  value={
+                    formik.values
+                      .desviacionEstandarDurantePeriodoRevisionEntrega || ""
+                  }
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={
+                    !!(
+                      formik.errors
+                        .desviacionEstandarDurantePeriodoRevisionEntrega &&
+                      formik.touched
+                        .desviacionEstandarDurantePeriodoRevisionEntrega
+                    )
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {
+                    formik.errors
+                      .desviacionEstandarDurantePeriodoRevisionEntrega
+                  }
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="formProveedorSearch">
+                <Form.Label>Buscar Proveedor</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Buscar proveedor..."
+                  value={proveedorSearch}
+                  onChange={(e) => setProveedorSearch(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formProveedorElegido">
+                <Form.Label>Proveedor</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="proveedorDTO.id"
+                  value={formik.values.proveedorDTO?.id || ""}
+                  onChange={(e) => {
+                    const selectedProveedor = proveedores.find(
+                      (prov) => prov.id === Number(e.target.value)
+                    );
+                    formik.setFieldValue(
+                      "proveedorDTO",
+                      selectedProveedor || null
+                    );
+                  }}
+                  isInvalid={
+                    !!(
+                      formik.errors.proveedorDTO && formik.touched.proveedorDTO
+                    )
+                  }
+                >
+                  <option value="">Seleccione un proveedor</option>
+                  {filteredProveedores.map((proveedor) => (
+                    <option key={proveedor.id} value={proveedor.id}>
+                      {proveedor.nomProv}
+                    </option>
+                  ))}
+                </Form.Control>
+                {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
+                  <div style={{ color: "red" }}>Error en el proveedor</div>
+                )}
+              </Form.Group>
+
+              <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!formik.isValid}
+                >
+                  Guardar
+                </Button>
+              </Modal.Footer>
+            </Form>
+          </Modal.Body>
+        </Modal>
       )}
     </>
   );
 };
 
-export default ProveedorModal;
+export default ArticuloModal;

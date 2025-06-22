@@ -1,4 +1,4 @@
-import type { Articulo } from "../types/Articulo";
+import type { ArticuloDTO } from "../types/ArticuloDTO";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -18,7 +18,7 @@ const handleResponse = async (response: Response) => {
 };
 
 export const ArticuloService = {
-  getArticulos: async (): Promise<Articulo[]> => {
+  getArticulos: async (): Promise<ArticuloDTO[]> => {
     try {
       const response = await fetch(`${BASE_URL}/Articulo`);
       return await handleResponse(response);
@@ -28,7 +28,7 @@ export const ArticuloService = {
     }
   },
 
-  getArticulo: async (id: number): Promise<Articulo> => {
+  getArticulo: async (id: number): Promise<ArticuloDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/Articulo/altaArticulo/${id}`);
       return await handleResponse(response);
@@ -38,7 +38,7 @@ export const ArticuloService = {
     }
   },
 
-  createArticulo: async (articulo: Articulo): Promise<Articulo> => {
+  createArticulo: async (articulo: ArticuloDTO): Promise<ArticuloDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/Articulo/altaArticulo`, {
         method: "POST",
@@ -54,7 +54,7 @@ export const ArticuloService = {
     }
   },
 
-  updateArticulo: async (id: number, articulo: Articulo): Promise<Articulo> => {
+  updateArticulo: async (id: number, articulo: ArticuloDTO): Promise<ArticuloDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/modificar/${id}`, {
         method: "PUT",
@@ -102,9 +102,9 @@ export const ArticuloService = {
     }
   },
 
-  bajaLogicaArticulo: async (id: number, articulo: Articulo): Promise<void> => {
+  bajaLogicaArticulo: async (id: number, articulo: ArticuloDTO): Promise<void> => {
     try {
-      articulo.fechaHoraBajaArt = new Date();
+      articulo.fechaHoraBajaArt = new Date().toISOString(); // Asegúrate de convertir la fecha a string ISO
       const response = await fetch(`${BASE_URL}/Articulo/altaArticulo/${id}`, {
         method: "PUT",
         headers: {

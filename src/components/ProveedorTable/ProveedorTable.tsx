@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { Proveedor } from "../../types/Proveedor";
 import { ProveedorService } from "../../services/ProveedorService";
 import Loader from "../Loader/Loader";
 import { Button, Table } from "react-bootstrap";
@@ -7,57 +6,65 @@ import { ModalType } from "../../types/ModalType";
 import ProveedorModal from "../ProveedorModal/ProveedorModal";
 import { EditButton } from "../EditButton/EditButton";
 import { DeleteButton } from "../DeleteButton/DeleteButton";
+import type { ProveedorDTO } from "../../types/ProveedorDTO";
 
 const ProveedorTable = () => {
-  //Const para inicializar un proveedor por defecto y evitar el undefined
-
-  const initializableNewProveedor = (): Proveedor => {
+  // Const para inicializar un proveedor por defecto y evitar el undefined
+  const initializableNewProveedor = (): ProveedorDTO => {
     return {
       id: 0,
       codProv: "",
       nomProv: "",
       descripcionProv: "",
-      fechaHoraBajaProv: null,
+      fechaHoraBajaProv: "",
+      proveedorArticulos: [],
     };
   };
-  //Const para manejar el estado del modal
 
-  const [proveedor, setProveedor] = useState<Proveedor>(
-    initializableNewProveedor
+  // Const para manejar el estado del modal
+  const [proveedor, setProveedor] = useState<ProveedorDTO>(
+    initializableNewProveedor()
   );
 
-  //Const para manejar estado del modal
+  // Const para manejar estado del modal
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
   const [title, setTitle] = useState("");
 
-  //Logica del Modal
-
-  const handleClick = (newTitle: string, prov: Proveedor, modal: ModalType) => {
+  // Lógica del Modal
+  const handleClick = (
+    newTitle: string,
+    prov: ProveedorDTO,
+    modal: ModalType
+  ) => {
     setTitle(newTitle);
     setModalType(modal);
     setProveedor(prov);
     setShowModal(true);
   };
 
-  //Variable que va a contener los datos recibido de la api
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+  // Variable que va a contener los datos recibido de la API
+  const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
 
-  const [isLoading, setIsloading] = useState(true);
-  //variable que va a actualizar los datos de la tabla luego de cada operacion exitosa
+  const [isLoading, setIsLoading] = useState(true);
+  // Variable que va a actualizar los datos de la tabla luego de cada operación exitosa
   const [refreshData, setRefreshData] = useState(false);
-  //Este hook se va a ejecutar cada vez que se renderice el componente o
-  //refresData cambie de estado
+
+  // Este hook se va a ejecutar cada vez que se renderice el componente o refreshData cambie de estado
   useEffect(() => {
     const fetchProveedores = async () => {
-      const proveedor = await ProveedorService.getProveedores();
-      setProveedores(proveedor);
-      setIsloading(false);
+      try {
+        const proveedores = await ProveedorService.getProveedores();
+        setProveedores(proveedores);
+      } catch (error) {
+        console.error("Error al obtener proveedores:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchProveedores();
   }, [refreshData]);
-  //Test, para que este log esta modificado para que se muestre
-  console.log(JSON.stringify(proveedores));
+
   return (
     <div>
       <h1>Tabla Proveedores</h1>
@@ -79,10 +86,10 @@ const ProveedorTable = () => {
           <thead>
             <tr>
               <th>Id</th>
-              <th>codProv</th>
-              <th>nomProv</th>
-              <th>descripcionProv</th>
-              <th>fechaHoraBajaProv</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Fecha de Baja</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -94,7 +101,11 @@ const ProveedorTable = () => {
                 <td>{prove.codProv}</td>
                 <td>{prove.nomProv}</td>
                 <td>{prove.descripcionProv}</td>
-                <td>{String(prove.fechaHoraBajaProv)}</td>
+                <td>
+                  {prove.fechaHoraBajaProv
+                    ? new Date(prove.fechaHoraBajaProv).toLocaleString()
+                    : "N/A"}
+                </td>
                 <td>
                   <EditButton
                     onClick={() =>

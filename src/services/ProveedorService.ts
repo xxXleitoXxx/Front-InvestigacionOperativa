@@ -1,24 +1,37 @@
-import type { Proveedor } from "../types/Proveedor";
+import type { ProveedorDTO } from "../types/ProveedorDTO";
 
 const BASE_URL = 'http://localhost:8080';
 
 const handleResponse = async (response: Response) => {
+  const contentType = response.headers.get('content-type');
+
   if (!response.ok) {
     let errorMessage = `Error: ${response.statusText}`;
-    try {
-      const errorData = await response.json();
-      // Asumiendo que el error tiene un formato como { error: "Mensaje de error" }
-      errorMessage = errorData.error || JSON.stringify(errorData);
-    } catch (error) {
-      console.error("Error parsing error response:", error);
+
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || JSON.stringify(errorData);
+      } catch (error) {
+        console.error("Error parsing error response as JSON:", error);
+        errorMessage = `Error parsing error response as JSON: ${await response.text()}`;
+      }
+    } else {
+      errorMessage = `Unexpected content type: ${contentType}, Message: ${await response.text()}`;
     }
+
     throw new Error(errorMessage);
   }
-  return response.json();
+
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  } else {
+    return response.text();
+  }
 };
 
 export const ProveedorService = {
-  getProveedores: async (): Promise<Proveedor[]> => {
+  getProveedores: async (): Promise<ProveedorDTO[]> => {
     try {
       const response = await fetch(`${BASE_URL}/Proveedor`);
       return await handleResponse(response);
@@ -28,7 +41,7 @@ export const ProveedorService = {
     }
   },
 
-  getProveedor: async (id: number): Promise<Proveedor> => {
+  getProveedor: async (id: number): Promise<ProveedorDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/Proveedor/${id}`);
       return await handleResponse(response);
@@ -38,7 +51,7 @@ export const ProveedorService = {
     }
   },
 
-  createProveedor: async (proveedor: Proveedor): Promise<Proveedor> => {
+  createProveedor: async (proveedor: ProveedorDTO): Promise<ProveedorDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/Proveedor`, {
         method: "POST",
@@ -54,7 +67,7 @@ export const ProveedorService = {
     }
   },
 
-  updateProveedor: async (id: number, proveedor: Proveedor): Promise<Proveedor> => {
+  updateProveedor: async (id: number, proveedor: ProveedorDTO): Promise<ProveedorDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/Proveedor/${id}`, {
         method: "PUT",
@@ -102,15 +115,13 @@ export const ProveedorService = {
     }
   },
 
-  bajaLogicaProveedor: async (id: number, proveedor: Proveedor): Promise<void> => {
+  bajaLogicaProveedor: async (id: number): Promise<void> => {
     try {
-      proveedor.fechaHoraBajaProv = new Date();
       const response = await fetch(`${BASE_URL}/Proveedor/${id}`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(proveedor)
       });
       return await handleResponse(response);
     } catch (error) {
