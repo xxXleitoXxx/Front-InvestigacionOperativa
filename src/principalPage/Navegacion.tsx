@@ -19,7 +19,9 @@ function Navegacion() {
               <Nav.Link onClick={() => navigate("/ordenCompra")}>
                 Orden De Compra
               </Nav.Link>
-              <Nav.Link onClick={() => navigate("/abmalumno")}>Ventas</Nav.Link>
+              <Nav.Link onClick={() => navigate("/venta")}>
+                Ventas
+                </Nav.Link>
               <Nav.Link onClick={() => navigate("/paginaProps")}>
                 PaginaProps
               </Nav.Link>
