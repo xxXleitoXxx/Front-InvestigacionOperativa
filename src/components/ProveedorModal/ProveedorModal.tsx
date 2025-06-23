@@ -27,9 +27,12 @@ const ProveedorModal = ({
   prov,
   refreshData,
 }: ProveedorModalProps) => {
-  const [showProveedorArticuloModal, setshowProveedorArticuloModal] =
+  const [showProveedorArticuloModal, setShowProveedorArticuloModal] =
     useState(false);
-  
+  const [proveedorArticulos, setProveedorArticulos] = useState<
+    ProveedorArticuloDTO[]
+  >(prov.proveedorArticulos || []);
+
   const initializableNewProveedorArticuloDTO = (): ProveedorArticuloDTO => {
     return {
       id: 0,
@@ -45,14 +48,14 @@ const ProveedorModal = ({
       cantidadAPedir: 0,
       inventarioMaximo: 0,
       periodoRevision: 0,
-      TipoLote: TipoLote.LOTEFIJO, // Asumiendo que TipoLote puede ser null
+      TipoLote: TipoLote.LOTEFIJO,
       articuloDTO: {
         id: 0,
         codArt: "",
         nomArt: "",
         precioVenta: 0,
         descripcionArt: "",
-        fechaHoraBajaArt: "", // Usamos string para representar la fecha en formato ISO
+        fechaHoraBajaArt: "",
         stock: 0,
         stockSeguridad: 0,
         demandaDiaria: 0,
@@ -60,30 +63,11 @@ const ProveedorModal = ({
         desviacionEstandarDurantePeriodoRevisionEntrega: 0,
         proveedorDTO: null,
       },
-      // Asumiendo que ArticuloDTO puede ser null
     };
   };
 
-  //Const para setear el proveedor incializado
-  const [proveedorArticuloDTO, setProveedorArticuloDTO] =
-    useState<ProveedorArticuloDTO>(initializableNewProveedorArticuloDTO());
-
-  // Const para manejar estado del modal
-  const [ModalTypeProveedorArt, setModalTypeProveedorArt] = useState<ModalType>(
-    ModalType.NONE
-  );
-  const [TitleProveedorArticulo, setTitleProveedorArticulo] = useState("");
-
-  //Logica Modal
-  const handleClick = (
-    newTitle: string,
-    provArt: ProveedorArticuloDTO,
-    modal: ModalType
-  ) => {
-    setTitleProveedorArticulo(newTitle);
-    setModalTypeProveedorArt(modal);
-    setProveedorArticuloDTO(provArt);
-    setshowProveedorArticuloModal(true);
+  const handleClick = () => {
+    setShowProveedorArticuloModal(true);
   };
 
   const handleSaveUpdate = async (proveedor: ProveedorDTO) => {
@@ -137,25 +121,25 @@ const ProveedorModal = ({
     codProv: Yup.string().required("El código del proveedor es requerido"),
     nomProv: Yup.string().required("El nombre del proveedor es requerido"),
     descripcionProv: Yup.string(),
-
-    
   });
 
-  //Formulario
   const formik = useFormik({
     initialValues: {
       ...prov,
+      proveedorArticulos: proveedorArticulos,
     },
     validationSchema: validationSchema,
-    validateOnChange: true,
-    validateOnBlur: true,
     onSubmit: handleSaveUpdate,
   });
 
+  const handleSaveProveedorArticulo = (
+    proveedorArticulo: ProveedorArticuloDTO
+  ) => {
+    setProveedorArticulos([...proveedorArticulos, proveedorArticulo]);
+  };
 
   return (
     <>
-      {/*Modal Para Borrar*/}
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <Modal.Header closeButton>
@@ -189,7 +173,6 @@ const ProveedorModal = ({
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={formik.handleSubmit}>
-              {/*CodProv*/}
               <Form.Group controlId="formCodProv">
                 <Form.Label>Código del Proveedor</Form.Label>
                 <Form.Control
@@ -205,7 +188,6 @@ const ProveedorModal = ({
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.codProv}
                 </Form.Control.Feedback>
-                {/*nomProv*/}
               </Form.Group>
               <Form.Group controlId="formNomProv">
                 <Form.Label>Nombre del Proveedor</Form.Label>
@@ -223,7 +205,6 @@ const ProveedorModal = ({
                   {formik.errors.nomProv}
                 </Form.Control.Feedback>
               </Form.Group>
-              {/*"descripcionProv"*/}
               <Form.Group controlId="formDescripcionProv">
                 <Form.Label>Descripción del Proveedor</Form.Label>
                 <Form.Control
@@ -243,81 +224,12 @@ const ProveedorModal = ({
                   {formik.errors.descripcionProv}
                 </Form.Control.Feedback>
               </Form.Group>
-              {/*Hasta aca todo bien */}
-              {/*
-              <Form.Group controlId="formArticuloSearch">
-                <Form.Label>Buscar Artículo</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar artículo..."
-                  value={articuloSearch}
-                  onChange={(e) => setArticuloSearch(e.target.value)}
-                />
-              </Form.Group>
-              
-              <Form.Group>
-                <Form.Label>Artículos</Form.Label>
-                <Form.Control
-                  as="select"
-                  onChange={(e) => {
-                    const selectedArticulo = articulos.find(
-                      (art) => art.id === Number(e.target.value)
-                    );
-                    if (selectedArticulo) {
-                      addArticuloToProveedor(selectedArticulo);
-                    }
-                  }}
-                >
-                  <option value="">Seleccione un artículo</option>
-                  {filteredArticulos.map((articulo) => (
-                    <option key={articulo.id} value={articulo.id}>
-                      {articulo.nomArt}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-              
-              <Form.Group>
-                <Form.Label>Artículos Asignados</Form.Label>
-                <ul>
-                  {formik.values.proveedorArticulos.map((pa) => (
-                    <li key={pa.id}>
-                      {`Artículo: ${pa.articuloDTO.nomArt} - Precio: ${pa.costoUnitario} - Demora: ${pa.demoraEntrega} días - Costo Pedido: ${pa.costoPedido}`}
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => {
-                          formik.setFieldValue(
-                            "proveedorArticulos",
-                            formik.values.proveedorArticulos.filter(
-                              (item) => item.id !== pa.id
-                            )
-                          );
-                        }}
-                      >
-                        Eliminar
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </Form.Group>
-              */}
               <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
                   Cancelar
                 </Button>
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() =>
-                    handleClick(
-                      "ProveedorArticuloModal",
-                      initializableNewProveedorArticuloDTO(),
-                      ModalType.CREATE
-                    )
-                  }
-                >
-                  Asignar Articulos
+                <Button variant="secondary" type="button" onClick={handleClick}>
+                  Asignar Artículos
                 </Button>
                 <Button
                   variant="primary"
@@ -334,11 +246,12 @@ const ProveedorModal = ({
       {showProveedorArticuloModal && (
         <ProveedorArticuloModal
           show={showProveedorArticuloModal}
-          onHide={() => setshowProveedorArticuloModal(false)}
-          provArt={proveedorArticuloDTO}
-          modalType={ModalTypeProveedorArt}
-          title={TitleProveedorArticulo}
-          onSave={setProveedorArticuloDTO}
+          onHide={() => setShowProveedorArticuloModal(false)}
+          provArt={null}
+          modalType={ModalType.CREATE}
+          title="Asignar Artículos"
+          onSave={handleSaveProveedorArticulo}
+          proveedorArticulos={proveedorArticulos}
         />
       )}
     </>

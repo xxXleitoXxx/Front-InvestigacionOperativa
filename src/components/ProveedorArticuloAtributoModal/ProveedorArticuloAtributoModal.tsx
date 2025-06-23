@@ -1,16 +1,14 @@
-//Falta Logica de como mandar el formulario a la clase Padre
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ModalType } from "../../types/ModalType";
 import type { ProveedorArticuloDTO } from "../../types/ProveedorArticuloDTO";
-import { ArticuloService } from "../../services/ArticuloSevice";
 import { toast } from "react-toastify";
 import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import { Button, Form, Modal } from "react-bootstrap";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { ArticuloService } from "../../services/ArticuloSevice";
 
-type ProveedorArticulAtributoModalProps = {
+type ProveedorArticuloAtributoModalProps = {
   showModalProvArti: boolean;
   onHide: () => void;
   modalTypeProvArt: ModalType;
@@ -25,23 +23,20 @@ const ProveedorArticuloAtributoModal = ({
   modalTypeProvArt,
   provArtatri,
   titleProvArt,
-  
-}: ProveedorArticulAtributoModalProps) => {
-  //Variables para Articulos
+  onSave,
+}: ProveedorArticuloAtributoModalProps) => {
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [articuloSearch, setArticuloSearch] = useState("");
-  //Modal
 
-  //fetchArticulos
   useEffect(() => {
     const fetchArticulos = async () => {
       try {
-        const data = await ArticuloService.getArticulos(); //tenemos que ver que sean los disponibles
+        const data = await ArticuloService.getArticulos();
         setArticulos(data);
       } catch (error) {
-        console.error("Error al obtener articulos:", error);
+        console.error("Error al obtener artículos:", error);
         toast.error(
-          `Error al cargar articulos: ${
+          `Error al cargar artículos: ${
             error instanceof Error ? error.message : String(error)
           }`
         );
@@ -50,49 +45,46 @@ const ProveedorArticuloAtributoModal = ({
 
     fetchArticulos();
   }, []);
-  //yup
-  const validationSchema = Yup.object().shape({});
-  const handleSaveUpdate =  (provearti: ProveedorArticuloDTO) => {
-    
-    onSave(provearti);
-      const isNew = provearti.id === 0;
-      toast.success(
-        isNew ? "Artículo creado con éxito" : "Artículo actualizado con éxito",
-        {
-          position: "top-center",
-        }
-      );
-      onHide();
-      refreshData((prevState) => !prevState);
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        `Ha ocurrido un error: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
-    }
-  };
+
+  const validationSchema = Yup.object().shape({
+    demoraEntrega: Yup.number().required("La demora de entrega es requerida"),
+    costoUnitario: Yup.number().required("El costo unitario es requerido"),
+    costoMantenimiento: Yup.number().required(
+      "El costo de mantenimiento es requerido"
+    ),
+    cantidadAPedir: Yup.number().required("La cantidad a pedir es requerida"),
+    periodoRevision: Yup.number().required(
+      "El período de revisión es requerido"
+    ),
+    TipoLote: Yup.string().required("El tipo de lote es requerido"),
+    articuloDTO: Yup.object().shape({
+      id: Yup.number().required("El artículo es requerido"),
+    }),
+  });
 
   const formik = useFormik({
     initialValues: {
       ...provArtatri,
     },
     validationSchema: validationSchema,
-    validateOnChange: true,
-    validateOnBlur: true,
-    onSubmit: handleSubmit,
+    onSubmit: (values) => {
+      onSave(values);
+      toast.success("Artículo guardado con éxito", {
+        position: "top-center",
+      });
+      onHide();
+    },
   });
 
-  //
   const filteredArticulos = articulos.filter((articulo) =>
     articulo.nomArt.toLowerCase().includes(articuloSearch.toLowerCase())
   );
+
   return (
     <div>
       {modalTypeProvArt === ModalType.DELETE ? (
         <Modal
-          showModalProvArti={showModalProvArti}
+          show={showModalProvArti}
           onHide={onHide}
           centered
           backdrop="static"
@@ -103,7 +95,7 @@ const ProveedorArticuloAtributoModal = ({
         </Modal>
       ) : (
         <Modal
-          showModalProvArti={showModalProvArti}
+          show={showModalProvArti}
           onHide={onHide}
           centered
           backdrop="static"
@@ -112,12 +104,12 @@ const ProveedorArticuloAtributoModal = ({
           <Modal.Header closeButton>
             <Modal.Title>{titleProvArt}</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={formik.handleSubmit}>
+          <Form onSubmit={formik.handleSubmit}>
+            <Modal.Body>
               <Form.Group controlId="formDemoraEntrega">
-                <Form.Label>DemoraEntrega</Form.Label>
+                <Form.Label>Demora de Entrega</Form.Label>
                 <Form.Control
-                  name="DemoraEntrega"
+                  name="demoraEntrega"
                   type="number"
                   value={formik.values.demoraEntrega || ""}
                   onChange={formik.handleChange}
@@ -135,9 +127,9 @@ const ProveedorArticuloAtributoModal = ({
               </Form.Group>
 
               <Form.Group controlId="formCostoUnitario">
-                <Form.Label>CostoUnitario</Form.Label>
+                <Form.Label>Costo Unitario</Form.Label>
                 <Form.Control
-                  name="CostoUnitario"
+                  name="costoUnitario"
                   type="number"
                   value={formik.values.costoUnitario || ""}
                   onChange={formik.handleChange}
@@ -155,9 +147,9 @@ const ProveedorArticuloAtributoModal = ({
               </Form.Group>
 
               <Form.Group controlId="formCostoMantenimiento">
-                <Form.Label>CostoMantenimiento</Form.Label>
+                <Form.Label>Costo de Mantenimiento</Form.Label>
                 <Form.Control
-                  name="CostoMantenimiento"
+                  name="costoMantenimiento"
                   type="number"
                   value={formik.values.costoMantenimiento || ""}
                   onChange={formik.handleChange}
@@ -173,10 +165,11 @@ const ProveedorArticuloAtributoModal = ({
                   {formik.errors.costoMantenimiento}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formCantidad A pedir">
-                <Form.Label>CantidadAPedir</Form.Label>
+
+              <Form.Group controlId="formCantidadAPedir">
+                <Form.Label>Cantidad a Pedir</Form.Label>
                 <Form.Control
-                  name="CantidadAPedir"
+                  name="cantidadAPedir"
                   type="number"
                   value={formik.values.cantidadAPedir || ""}
                   onChange={formik.handleChange}
@@ -192,10 +185,11 @@ const ProveedorArticuloAtributoModal = ({
                   {formik.errors.cantidadAPedir}
                 </Form.Control.Feedback>
               </Form.Group>
+
               <Form.Group controlId="formPeriodoRevision">
-                <Form.Label>PeriodoRevision</Form.Label>
+                <Form.Label>Período de Revisión</Form.Label>
                 <Form.Control
-                  name="demandaDiaria"
+                  name="periodoRevision"
                   type="number"
                   value={formik.values.periodoRevision || ""}
                   onChange={formik.handleChange}
@@ -211,8 +205,9 @@ const ProveedorArticuloAtributoModal = ({
                   {formik.errors.periodoRevision}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="Tipo Lote">
-                <Form.Label>TipoLote</Form.Label>
+
+              <Form.Group controlId="formTipoLote">
+                <Form.Label>Tipo de Lote</Form.Label>
                 <Form.Control
                   as="select"
                   name="TipoLote"
@@ -222,27 +217,31 @@ const ProveedorArticuloAtributoModal = ({
                   isInvalid={
                     !!(formik.errors.TipoLote && formik.touched.TipoLote)
                   }
-                />
+                >
+                  <option value="">Seleccione un tipo de lote</option>
+                  <option value="LOTEFIJO">Lote Fijo</option>
+                  <option value="LOTEVARIABLE">Lote Variable</option>
+                </Form.Control>
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.TipoLote}
                 </Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group controlId="formArticuloSearch">
-                <Form.Label>Buscar Articulo</Form.Label>
+                <Form.Label>Buscar Artículo</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Buscar articulo..."
+                  placeholder="Buscar artículo..."
                   value={articuloSearch}
                   onChange={(e) => setArticuloSearch(e.target.value)}
                 />
               </Form.Group>
 
               <Form.Group controlId="formArticuloElegido">
-                <Form.Label>Articulo</Form.Label>
+                <Form.Label>Artículo</Form.Label>
                 <Form.Control
                   as="select"
-                  name="proveedorDTO.id"
+                  name="articuloDTO.id"
                   value={formik.values.articuloDTO?.id || ""}
                   onChange={(e) => {
                     const selectedArticulo = articulos.find(
@@ -257,7 +256,7 @@ const ProveedorArticuloAtributoModal = ({
                     !!(formik.errors.articuloDTO && formik.touched.articuloDTO)
                   }
                 >
-                  <option value="">Seleccione un proveedor</option>
+                  <option value="">Seleccione un artículo</option>
                   {filteredArticulos.map((articulo) => (
                     <option key={articulo.id} value={articulo.id}>
                       {articulo.nomArt}
@@ -265,20 +264,23 @@ const ProveedorArticuloAtributoModal = ({
                   ))}
                 </Form.Control>
                 {formik.errors.articuloDTO && formik.touched.articuloDTO && (
-                  <div style={{ color: "red" }}>Error en el proveedor</div>
+                  <div style={{ color: "red" }}>Error en el artículo</div>
                 )}
               </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={onHide}>
-              Cancelar
-            </Button>
-
-            <Button variant="primary" type="submit" disabled={!formik.isValid}>
-              Guardar
-            </Button>
-          </Modal.Footer>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={onHide}>
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={!formik.isValid}
+              >
+                Guardar
+              </Button>
+            </Modal.Footer>
+          </Form>
         </Modal>
       )}
     </div>

@@ -14,15 +14,17 @@ type ProveedorArticuloModalProps = {
   modalType: ModalType;
   title: string;
   onSave: (proveedorArticulo: ProveedorArticuloDTO) => void;
+  proveedorArticulos: ProveedorArticuloDTO[];
 };
-<div></div>;
+
 const ProveedorArticuloModal = ({
   show,
   onHide,
   provArt,
-  onSave,
   modalType,
   title,
+  onSave,
+  proveedorArticulos,
 }: ProveedorArticuloModalProps) => {
   const [proveedorArticulo, setProveedorArticulo] =
     useState<ProveedorArticuloDTO>({
@@ -63,116 +65,25 @@ const ProveedorArticuloModal = ({
       },
     });
 
-  const [refreshData2, setRefreshData] = useState(false);
-  const [proveedoresArticuloTable, setProveedoresArticuloTable] = useState<
-    ProveedorArticuloDTO[]
-  >([
-    {
-      id: 0,
-      fechaHoraBajaArtProv: "",
-      costoGeneralInventario: 0,
-      demoraEntrega: 0,
-      nivelDeServicio: 0,
-      costoUnitario: 0,
-      costoPedido: 0,
-      costoMantenimiento: 0,
-      loteOptimo: 0,
-      puntoPedido: 0,
-      cantidadAPedir: 0,
-      inventarioMaximo: 0,
-      periodoRevision: 0,
-      TipoLote: TipoLote.LOTEFIJO,
-      articuloDTO: {
-        id: 0,
-        codArt: "",
-        nomArt: "",
-        precioVenta: 0,
-        descripcionArt: "",
-        fechaHoraBajaArt: "",
-        stock: 0,
-        stockSeguridad: 0,
-        demandaDiaria: 0,
-        desviacionEstandarUsoPeriodoEntrega: 0,
-        desviacionEstandarDurantePeriodoRevisionEntrega: 0,
-        proveedorDTO: {
-          id: 0,
-          codProv: "",
-          nomProv: "",
-          descripcionProv: "",
-          fechaHoraBajaProv: "",
-          proveedorArticulos: [],
-        },
-      },
-    },
-  ]);
-
-  const initializableNewProvArt = (): ProveedorArticuloDTO => {
-    return {
-      id: 0,
-      fechaHoraBajaArtProv: "",
-      costoGeneralInventario: 0,
-      demoraEntrega: 0,
-      nivelDeServicio: 0,
-      costoUnitario: 0,
-      costoPedido: 0,
-      costoMantenimiento: 0,
-      loteOptimo: 0,
-      puntoPedido: 0,
-      cantidadAPedir: 0,
-      inventarioMaximo: 0,
-      periodoRevision: 0,
-      TipoLote: TipoLote.LOTEFIJO,
-      articuloDTO: {
-        id: 0,
-        codArt: "",
-        nomArt: "",
-        precioVenta: 0,
-        descripcionArt: "",
-        fechaHoraBajaArt: "",
-        stock: 0,
-        stockSeguridad: 0,
-        demandaDiaria: 0,
-        desviacionEstandarUsoPeriodoEntrega: 0,
-        desviacionEstandarDurantePeriodoRevisionEntrega: 0,
-        proveedorDTO: {
-          id: 0,
-          codProv: "",
-          nomProv: "",
-          descripcionProv: "",
-          fechaHoraBajaProv: "",
-          proveedorArticulos: [],
-        },
-      },
-    };
-  };
-
-  // const handleChange = (e: React.ChangeEvent<FormControl>) => {
-  //   const { name, value } = e.target;
-  //   setProveedorArticulo({ ...proveedorArticulo, [name]: value });
-  // };
-
-  const handleSubmit = () => {
-    onSave(proveedorArticulo);
-    onHide();
-  };
-  //Modal Añadir Articulos
-  // Constantes para manejar el estado del modal
-  const [showModalProvArt, setshowModalProvArt] = useState(false);
-  const [modalTypeProvArt, setmodalTypeProvArt] = useState<ModalType>(
+  const [showModalProvArt, setShowModalProvArt] = useState(false);
+  const [modalTypeProvArt, setModalTypeProvArt] = useState<ModalType>(
     ModalType.NONE
   );
   const [titleProvArt, setTitleProvArt] = useState("");
 
-  // Lógica del Modal
   const handleClick = (
     newTitle: string,
-    ProvArtAtri: ProveedorArticuloDTO,
+    provArtAtri: ProveedorArticuloDTO,
     modal: ModalType
   ) => {
     setTitleProvArt(newTitle);
-    setmodalTypeProvArt(modal);
-    setProveedorArticulo(ProvArtAtri);
-    setshowModalProvArt(true);
+    setModalTypeProvArt(modal);
+    setProveedorArticulo(provArtAtri);
+    setShowModalProvArt(true);
+  };
+
+  const handleSubmit = () => {
+    onHide();
   };
 
   return (
@@ -202,45 +113,45 @@ const ProveedorArticuloModal = ({
                 onClick={() =>
                   handleClick(
                     "Añadir Artículo",
-                    initializableNewProvArt(),
+                    proveedorArticulo,
                     ModalType.CREATE
                   )
                 }
               >
-                Añadir Articulos
+                Añadir Artículos
               </Button>
             </div>
             <div>
               <Table striped bordered hover>
                 <thead>
                   <tr>
-                    <td>Articulo</td>
-                    <td>DemoraEntrega</td>
-                    <td>CostoUnitario</td>
-                    <td>CostoMantenimiento</td>
-                    <td>CantidadAPedir</td>
-                    <td>PeriodoRevision</td>
-                    <td>TipoLote</td>
+                    <td>Artículo</td>
+                    <td>Demora Entrega</td>
+                    <td>Costo Unitario</td>
+                    <td>Costo Mantenimiento</td>
+                    <td>Cantidad a Pedir</td>
+                    <td>Período Revisión</td>
+                    <td>Tipo Lote</td>
                     <td>Editar</td>
                     <td>Eliminar</td>
                   </tr>
                 </thead>
                 <tbody>
-                  {proveedoresArticuloTable.map((provarti) => (
-                    <tr key={provarti.id}>
-                      <td>{provarti.articuloDTO.nomArt}</td>
-                      <td>{provarti.demoraEntrega}</td>
-                      <td>{provarti.costoUnitario}</td>
-                      <td>{provarti.costoMantenimiento}</td>
-                      <td>{provarti.cantidadAPedir}</td>
-                      <td>{provarti.periodoRevision}</td>
-                      <td>{provarti.TipoLote}</td>
+                  {proveedorArticulos.map((provArti) => (
+                    <tr key={provArti.id}>
+                      <td>{provArti.articuloDTO.nomArt}</td>
+                      <td>{provArti.demoraEntrega}</td>
+                      <td>{provArti.costoUnitario}</td>
+                      <td>{provArti.costoMantenimiento}</td>
+                      <td>{provArti.cantidadAPedir}</td>
+                      <td>{provArti.periodoRevision}</td>
+                      <td>{provArti.TipoLote}</td>
                       <td>
                         <EditButton
                           onClick={() =>
                             handleClick(
                               "Editar artículo",
-                              provarti,
+                              provArti,
                               ModalType.UPDATE
                             )
                           }
@@ -251,7 +162,7 @@ const ProveedorArticuloModal = ({
                           onClick={() =>
                             handleClick(
                               "Borrar Artículo",
-                              provarti,
+                              provArti,
                               ModalType.DELETE
                             )
                           }
@@ -267,7 +178,6 @@ const ProveedorArticuloModal = ({
             <Button variant="secondary" onClick={onHide}>
               Cancelar
             </Button>
-
             <Button variant="primary" onClick={handleSubmit}>
               Guardar
             </Button>
@@ -277,14 +187,15 @@ const ProveedorArticuloModal = ({
       {showModalProvArt && (
         <ProveedorArticuloAtributoModal
           showModalProvArti={showModalProvArt}
-          onHide={() => setshowModalProvArt(false)}
+          onHide={() => setShowModalProvArt(false)}
           modalTypeProvArt={modalTypeProvArt}
           provArtatri={proveedorArticulo}
           titleProvArt={titleProvArt}
-          refreshData2={setRefreshData2}
+          onSave={onSave}
         />
       )}
     </div>
   );
 };
+
 export default ProveedorArticuloModal;
