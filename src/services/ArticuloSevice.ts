@@ -54,9 +54,9 @@ export const ArticuloService = {
     }
   },
 
-  updateArticulo: async (id: number, articulo: ArticuloDTO): Promise<ArticuloDTO> => {
+  updateArticulo: async (articulo: ArticuloDTO): Promise<ArticuloDTO> => {
     try {
-      const response = await fetch(`${BASE_URL}/modificar/${id}`, {
+      const response = await fetch(`${BASE_URL}/Articulo/modificarArticulo`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'
@@ -102,10 +102,26 @@ export const ArticuloService = {
     }
   },
 
-  bajaLogicaArticulo: async (id: number, articulo: ArticuloDTO): Promise<void> => {
-    try {
-      articulo.fechaHoraBajaArt = new Date().toISOString(); // Asegúrate de convertir la fecha a string ISO
-      const response = await fetch(`${BASE_URL}/Articulo/altaArticulo/${id}`, {
+  bajaLogicaArticulo: async (articulo: ArticuloDTO): Promise<void> => {
+     try {
+      console.log(articulo);
+      const response = await fetch(`${BASE_URL}/Articulo/bajaArticulo`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(articulo)
+      });
+      return await handleResponse(response);
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    }
+  },
+  altaLogicaArticulo: async (articulo: ArticuloDTO): Promise<void> => {
+     try {
+      console.log(articulo);
+      const response = await fetch(`${BASE_URL}/Articulo/bajaArticulo`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'

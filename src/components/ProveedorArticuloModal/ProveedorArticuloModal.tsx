@@ -125,20 +125,26 @@ const ProveedorArticuloModal = ({
               <Table striped bordered hover>
                 <thead>
                   <tr>
-                    <td>Artículo</td>
-                    <td>Demora Entrega</td>
-                    <td>Costo Unitario</td>
-                    <td>Costo Mantenimiento</td>
-                    <td>Cantidad a Pedir</td>
-                    <td>Período Revisión</td>
-                    <td>Tipo Lote</td>
-                    <td>Editar</td>
-                    <td>Eliminar</td>
+                    <th>Artículo</th>
+                    <th>Demora Entrega</th>
+                    <th>Costo Unitario</th>
+                    <th>Costo Mantenimiento</th>
+                    <th>Cantidad a Pedir</th>
+                    <th>Período Revisión</th>
+                    <th>Tipo Lote</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
                   </tr>
                 </thead>
                 <tbody>
                   {proveedorArticulos.map((provArti) => (
-                    <tr key={provArti.id}>
+                    <tr
+                      key={
+                        provArti.id
+                          ? provArti.id
+                          : Math.random().toString(36).substr(2, 9)
+                      }
+                    >
                       <td>{provArti.articuloDTO.nomArt}</td>
                       <td>{provArti.demoraEntrega}</td>
                       <td>{provArti.costoUnitario}</td>

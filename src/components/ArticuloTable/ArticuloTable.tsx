@@ -7,6 +7,7 @@ import { EditButton } from "../EditButton/EditButton";
 import { DeleteButton } from "../DeleteButton/DeleteButton";
 import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import { ArticuloService } from "../../services/ArticuloSevice";
+import { ButtonAlta } from "../ButtonAlta/ButtonAlta";
 
 const ArticuloTable = () => {
   // Constante para inicializar un artículo por defecto y evitar el undefined
@@ -122,13 +123,24 @@ const ArticuloTable = () => {
                     }
                   />
                 </td>
-                <td>
-                  <DeleteButton
-                    onClick={() =>
-                      handleClick("Borrar Artículo", art, ModalType.DELETE)
-                    }
-                  />
-                </td>
+                {art.fechaHoraBajaArt == null && (
+                  <td>
+                    <DeleteButton
+                      onClick={() =>
+                        handleClick("Borrar Artículo", art, ModalType.DELETE)
+                      }
+                    />
+                  </td>
+                )}
+                {art.fechaHoraBajaArt != null && (
+                  <td>
+                    <ButtonAlta
+                      onClick={() =>
+                        handleClick("Dar de Alta Artículo", art, ModalType.ALTA)
+                      }
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -53,7 +53,7 @@ const ArticuloModal = ({
       if (isNew) {
         await ArticuloService.createArticulo(arti);
       } else {
-        await ArticuloService.updateArticulo(arti.id, arti);
+        await ArticuloService.updateArticulo(arti);
       }
       toast.success(
         isNew ? "Artículo creado con éxito" : "Artículo actualizado con éxito",
@@ -72,10 +72,23 @@ const ArticuloModal = ({
       );
     }
   };
+  const handleAltaLogica = async () => {
+    try {
+      await ArticuloService.altaLogicaArticulo(art);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        `Ha ocurrido un error: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
+  };
 
   const handleDelete = async () => {
     try {
-      await ArticuloService.bajaLogicaArticulo(art.id, art);
+      console.log(art.nomArt);
+      await ArticuloService.bajaLogicaArticulo(art);
       toast.success("Artículo eliminado con éxito", {
         position: "top-center",
       });
@@ -160,6 +173,26 @@ const ArticuloModal = ({
             </Button>
             <Button variant="danger" onClick={handleDelete}>
               Eliminar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      ) : modalType === ModalType.ALTA ? (
+        <Modal show={show} onHide={onHide} centered backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>{title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              ¿Está seguro que desea dar de Alta el artículo? <br />
+              <strong>{art.nomArt}</strong>
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={onHide}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleAltaLogica}>
+              Dar de alta
             </Button>
           </Modal.Footer>
         </Modal>

@@ -2,5 +2,6 @@ export enum ModalType{
     NONE,
     CREATE,
     UPDATE,
-    DELETE
+    DELETE,
+    ALTA,
 }
