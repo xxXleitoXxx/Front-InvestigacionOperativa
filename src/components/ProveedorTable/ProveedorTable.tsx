@@ -21,7 +21,7 @@ const ProveedorTable = () => {
     };
   };
 
-  // Const para manejar el estado del modal
+  //Const para setear el proveedor incializado
   const [proveedor, setProveedor] = useState<ProveedorDTO>(
     initializableNewProveedor()
   );
@@ -47,6 +47,7 @@ const ProveedorTable = () => {
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+
   // Variable que va a actualizar los datos de la tabla luego de cada operación exitosa
   const [refreshData, setRefreshData] = useState(false);
 
@@ -65,9 +66,11 @@ const ProveedorTable = () => {
     fetchProveedores();
   }, [refreshData]);
 
+  //Tabla Proveedores
   return (
     <div>
       <h1>Tabla Proveedores</h1>
+      {/*Boton que envia los parametros al Modal*/}
       <Button
         onClick={() =>
           handleClick(
@@ -79,6 +82,7 @@ const ProveedorTable = () => {
       >
         Nuevo Proveedor
       </Button>
+      
       {isLoading ? (
         <Loader />
       ) : (

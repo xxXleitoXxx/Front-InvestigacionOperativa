@@ -125,7 +125,7 @@ const ArticuloModal = ({
   const formik = useFormik({
     initialValues: {
       ...art,
-      demandaDiaria: art.demandaDiaria || 1,
+      demandaDiaria: art.demandaDiaria || 0,
       desviacionEstandarUsoPeriodoEntrega:
         art.desviacionEstandarUsoPeriodoEntrega || 1,
       desviacionEstandarDurantePeriodoRevisionEntrega:

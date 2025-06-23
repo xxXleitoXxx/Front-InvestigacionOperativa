@@ -27,10 +27,10 @@ const ArticuloTable = () => {
     };
   };
 
-  // Constantes para manejar el estado del modal
   const [articulo, setArticulo] = useState<ArticuloDTO>(
     initializableNewArticulo()
   );
+  // Constantes para manejar el estado del modal
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
   const [title, setTitle] = useState("");

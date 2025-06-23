@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { ModalType } from "../../types/ModalType";
 import * as Yup from "yup";
@@ -6,10 +6,9 @@ import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import { ProveedorService } from "../../services/ProveedorService";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
-import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import type { ProveedorArticuloDTO } from "../../types/ProveedorArticuloDTO";
-import { ArticuloService } from "../../services/ArticuloSevice";
 import ProveedorArticuloModal from "../ProveedorArticuloModal/ProveedorArticuloModal";
+import { TipoLote } from "../../types/TipoLote";
 
 type ProveedorModalProps = {
   show: boolean;
@@ -28,30 +27,64 @@ const ProveedorModal = ({
   prov,
   refreshData,
 }: ProveedorModalProps) => {
-  const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
-  const [articuloSearch, setArticuloSearch] = useState("");
-  const [showArticuloModal, setShowArticuloModal] = useState(false);
-  const [selectedArticulo, setSelectedArticulo] = useState<ArticuloDTO | null>(
-    null
-  );
-
-  useEffect(() => {
-    const fetchArticulos = async () => {
-      try {
-        const data = await ArticuloService.getArticulos();
-        setArticulos(data);
-      } catch (error) {
-        console.error("Error al obtener artículos:", error);
-        toast.error(
-          `Error al cargar artículos: ${
-            error instanceof Error ? error.message : String(error)
-          }`
-        );
-      }
+  const [showProveedorArticuloModal, setshowProveedorArticuloModal] =
+    useState(false);
+  
+  const initializableNewProveedorArticuloDTO = (): ProveedorArticuloDTO => {
+    return {
+      id: 0,
+      fechaHoraBajaArtProv: "",
+      costoGeneralInventario: 0,
+      demoraEntrega: 0,
+      nivelDeServicio: 0,
+      costoUnitario: 0,
+      costoPedido: 0,
+      costoMantenimiento: 0,
+      loteOptimo: 0,
+      puntoPedido: 0,
+      cantidadAPedir: 0,
+      inventarioMaximo: 0,
+      periodoRevision: 0,
+      TipoLote: TipoLote.LOTEFIJO, // Asumiendo que TipoLote puede ser null
+      articuloDTO: {
+        id: 0,
+        codArt: "",
+        nomArt: "",
+        precioVenta: 0,
+        descripcionArt: "",
+        fechaHoraBajaArt: "", // Usamos string para representar la fecha en formato ISO
+        stock: 0,
+        stockSeguridad: 0,
+        demandaDiaria: 0,
+        desviacionEstandarUsoPeriodoEntrega: 0,
+        desviacionEstandarDurantePeriodoRevisionEntrega: 0,
+        proveedorDTO: null,
+      },
+      // Asumiendo que ArticuloDTO puede ser null
     };
+  };
 
-    fetchArticulos();
-  }, []);
+  //Const para setear el proveedor incializado
+  const [proveedorArticuloDTO, setProveedorArticuloDTO] =
+    useState<ProveedorArticuloDTO>(initializableNewProveedorArticuloDTO());
+
+  // Const para manejar estado del modal
+  const [ModalTypeProveedorArt, setModalTypeProveedorArt] = useState<ModalType>(
+    ModalType.NONE
+  );
+  const [TitleProveedorArticulo, setTitleProveedorArticulo] = useState("");
+
+  //Logica Modal
+  const handleClick = (
+    newTitle: string,
+    provArt: ProveedorArticuloDTO,
+    modal: ModalType
+  ) => {
+    setTitleProveedorArticulo(newTitle);
+    setModalTypeProveedorArt(modal);
+    setProveedorArticuloDTO(provArt);
+    setshowProveedorArticuloModal(true);
+  };
 
   const handleSaveUpdate = async (proveedor: ProveedorDTO) => {
     try {
@@ -104,25 +137,14 @@ const ProveedorModal = ({
     codProv: Yup.string().required("El código del proveedor es requerido"),
     nomProv: Yup.string().required("El nombre del proveedor es requerido"),
     descripcionProv: Yup.string(),
-    fechaHoraBajaProv: Yup.date().nullable(),
-    proveedorArticulos: Yup.array().of(
-      Yup.object().shape({
-        precioArtProv: Yup.number().required("El precio es requerido"),
-        demoraEntrega: Yup.number().required(
-          "La demora de entrega es requerida"
-        ),
-        costoPedido: Yup.number().required("El costo del pedido es requerido"),
-        articuloDTO: Yup.object().shape({
-          id: Yup.number().required("El ID del artículo es requerido"),
-        }),
-      })
-    ),
+
+    
   });
 
+  //Formulario
   const formik = useFormik({
     initialValues: {
       ...prov,
-      proveedorArticulos: prov.proveedorArticulos || [],
     },
     validationSchema: validationSchema,
     validateOnChange: true,
@@ -130,24 +152,10 @@ const ProveedorModal = ({
     onSubmit: handleSaveUpdate,
   });
 
-  const filteredArticulos = articulos.filter((articulo) =>
-    articulo.nomArt.toLowerCase().includes(articuloSearch.toLowerCase())
-  );
-
-  const addArticuloToProveedor = (articulo: ArticuloDTO) => {
-    setSelectedArticulo(articulo);
-    setShowArticuloModal(true);
-  };
-
-  const saveProveedorArticulo = (proveedorArticulo: ProveedorArticuloDTO) => {
-    formik.setFieldValue("proveedorArticulos", [
-      ...formik.values.proveedorArticulos,
-      proveedorArticulo,
-    ]);
-  };
 
   return (
     <>
+      {/*Modal Para Borrar*/}
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <Modal.Header closeButton>
@@ -181,6 +189,7 @@ const ProveedorModal = ({
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={formik.handleSubmit}>
+              {/*CodProv*/}
               <Form.Group controlId="formCodProv">
                 <Form.Label>Código del Proveedor</Form.Label>
                 <Form.Control
@@ -196,8 +205,8 @@ const ProveedorModal = ({
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.codProv}
                 </Form.Control.Feedback>
+                {/*nomProv*/}
               </Form.Group>
-
               <Form.Group controlId="formNomProv">
                 <Form.Label>Nombre del Proveedor</Form.Label>
                 <Form.Control
@@ -214,7 +223,7 @@ const ProveedorModal = ({
                   {formik.errors.nomProv}
                 </Form.Control.Feedback>
               </Form.Group>
-
+              {/*"descripcionProv"*/}
               <Form.Group controlId="formDescripcionProv">
                 <Form.Label>Descripción del Proveedor</Form.Label>
                 <Form.Control
@@ -234,7 +243,8 @@ const ProveedorModal = ({
                   {formik.errors.descripcionProv}
                 </Form.Control.Feedback>
               </Form.Group>
-
+              {/*Hasta aca todo bien */}
+              {/*
               <Form.Group controlId="formArticuloSearch">
                 <Form.Label>Buscar Artículo</Form.Label>
                 <Form.Control
@@ -244,7 +254,7 @@ const ProveedorModal = ({
                   onChange={(e) => setArticuloSearch(e.target.value)}
                 />
               </Form.Group>
-
+              
               <Form.Group>
                 <Form.Label>Artículos</Form.Label>
                 <Form.Control
@@ -266,7 +276,7 @@ const ProveedorModal = ({
                   ))}
                 </Form.Control>
               </Form.Group>
-
+              
               <Form.Group>
                 <Form.Label>Artículos Asignados</Form.Label>
                 <ul>
@@ -291,10 +301,23 @@ const ProveedorModal = ({
                   ))}
                 </ul>
               </Form.Group>
-
+              */}
               <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
                   Cancelar
+                </Button>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() =>
+                    handleClick(
+                      "ProveedorArticuloModal",
+                      initializableNewProveedorArticuloDTO(),
+                      ModalType.CREATE
+                    )
+                  }
+                >
+                  Asignar Articulos
                 </Button>
                 <Button
                   variant="primary"
@@ -308,13 +331,16 @@ const ProveedorModal = ({
           </Modal.Body>
         </Modal>
       )}
-
-      <ProveedorArticuloModal
-        show={showArticuloModal}
-        onHide={() => setShowArticuloModal(false)}
-        articulo={selectedArticulo}
-        onSave={saveProveedorArticulo}
-      />
+      {showProveedorArticuloModal && (
+        <ProveedorArticuloModal
+          show={showProveedorArticuloModal}
+          onHide={() => setshowProveedorArticuloModal(false)}
+          provArt={proveedorArticuloDTO}
+          modalType={ModalTypeProveedorArt}
+          title={TitleProveedorArticulo}
+          onSave={setProveedorArticuloDTO}
+        />
+      )}
     </>
   );
 };
