@@ -1,6 +1,8 @@
 export interface VentaArticuloDTO {
   id: number;
-  artId: number;
-  cantArtVent: number;
+  articuloDTO: {
+    id: number;
+  };
+  cantArtVentDTO: number;
   montoArt: number;
 }

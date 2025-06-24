@@ -8,6 +8,7 @@ import { EditButton } from "../EditButton/EditButton";
 import { DeleteButton } from "../DeleteButton/DeleteButton";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
 import type { VentaDTO } from "../../types/VentaDto";
+import VentaModal from "../VentaModal/VentaModal";
 
 const VentaTable = () => {
   // Const para inicializar un proveedor por defecto y evitar el undefined
@@ -99,6 +100,15 @@ const VentaTable = () => {
             ))}
           </tbody>
         </Table>
+      )}{showModal && (
+        <VentaModal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          modalType={modalType}
+          vent={venta}
+          title={title}
+          refreshData={setRefreshData}
+        />
       )}
     </div>
   );
