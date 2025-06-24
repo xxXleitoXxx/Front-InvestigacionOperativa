@@ -28,7 +28,8 @@ const ArticuloModal = ({
 }: ArticuloModalProps) => {
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
-
+  /////---------------------------Peticiones--------------------------------////
+  //GET proveedores fetch
   useEffect(() => {
     const fetchProveedores = async () => {
       try {
@@ -46,7 +47,7 @@ const ArticuloModal = ({
 
     fetchProveedores();
   }, []);
-
+  //POST y PUT ArticulosDTO
   const handleSaveUpdate = async (arti: ArticuloDTO) => {
     try {
       const isNew = arti.id === 0;
@@ -72,6 +73,8 @@ const ArticuloModal = ({
       );
     }
   };
+
+  //Dar de AltaLogica(despues de eliminar)
   const handleAltaLogica = async () => {
     try {
       await ArticuloService.altaLogicaArticulo(art);
@@ -84,7 +87,7 @@ const ArticuloModal = ({
       );
     }
   };
-
+  //baja Logica Articulos
   const handleDelete = async () => {
     try {
       console.log(art.nomArt);
@@ -103,6 +106,19 @@ const ArticuloModal = ({
       );
     }
   };
+
+  /////---------------------------Peticiones--------------------------------////
+
+  /////---------------------------Logica y Metodos--------------------------------////
+
+  //buscar Proveedores en formulario
+  const filteredProveedores = proveedores.filter((proveedor) =>
+    proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
+  );
+  /////---------------------------Logica y Metodos ---------------------------------////
+
+  /////---------------------------Formulario--------------------------------////
+  //esquema de validacion de formulario
 
   const validationSchema = Yup.object().shape({
     id: Yup.number().integer().min(0).required("El ID es requerido"),
@@ -128,17 +144,13 @@ const ArticuloModal = ({
       .required(
         "La desviación estándar durante el período de revisión es requerida"
       ),
-    proveedorDTO: Yup.object()
-      .shape({
-        id: Yup.number(),
-      })
-      .nullable(),
   });
 
+  //formik InicialValues
   const formik = useFormik({
     initialValues: {
       ...art,
-      demandaDiaria: art.demandaDiaria || 0,
+      demandaDiaria: art.demandaDiaria || 1,
       desviacionEstandarUsoPeriodoEntrega:
         art.desviacionEstandarUsoPeriodoEntrega || 1,
       desviacionEstandarDurantePeriodoRevisionEntrega:
@@ -149,13 +161,11 @@ const ArticuloModal = ({
     validateOnBlur: true,
     onSubmit: handleSaveUpdate,
   });
-
-  const filteredProveedores = proveedores.filter((proveedor) =>
-    proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
-  );
+  /////---------------------------Formulario--------------------------------////
 
   return (
     <>
+      {/* depende de la peticion del padre es el modal que se muestra */}
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <Modal.Header closeButton>
@@ -403,6 +413,38 @@ const ArticuloModal = ({
                 </Form.Control>
                 {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
                   <div style={{ color: "red" }}>Error en el proveedor</div>
+                )}
+              </Form.Group>
+              <Form.Group controlId="formArticuloElegido">
+                <Form.Label>Proveedor</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="proveedorDTO.id"
+                  value={formik.values.proveedorDTO?.id || ""}
+                  onChange={(e) => {
+                    const selectedProveedor = proveedores.find(
+                      (art) => art.id === Number(e.target.value)
+                    );
+                    formik.setFieldValue(
+                      "proveedorDTO",
+                      selectedProveedor || null
+                    );
+                  }}
+                  isInvalid={
+                    !!(
+                      formik.errors.proveedorDTO && formik.touched.proveedorDTO
+                    )
+                  }
+                >
+                  <option value="">Seleccione un proveedor</option>
+                  {filteredProveedores.map((proveedor) => (
+                    <option key={proveedor.id} value={proveedor.id}>
+                      {proveedor.nomProv}
+                    </option>
+                  ))}
+                </Form.Control>
+                {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
+                  <div style={{ color: "red" }}>Error en el artículo</div>
                 )}
               </Form.Group>
 
