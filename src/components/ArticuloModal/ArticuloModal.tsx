@@ -28,6 +28,7 @@ const ArticuloModal = ({
 }: ArticuloModalProps) => {
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
+  const [selectedProveedorCod, setSelectedProveedorCod] = useState<string>("");
   /////---------------------------Peticiones--------------------------------////
   //GET proveedores fetch
   useEffect(() => {
@@ -47,9 +48,30 @@ const ArticuloModal = ({
 
     fetchProveedores();
   }, []);
+
+  // Initialize selectedProveedorCod when art changes
+  useEffect(() => {
+    if (art.proveedorDTO?.codProv) {
+      setSelectedProveedorCod(art.proveedorDTO.codProv);
+    } else {
+      setSelectedProveedorCod("");
+    }
+  }, [art]);
   //POST y PUT ArticulosDTO
   const handleSaveUpdate = async (arti: ArticuloDTO) => {
     try {
+      console.log("=== ARTÍCULO A ENVIAR ===");
+      console.log("Artículo completo:", arti);
+      console.log("ID:", arti.id);
+      console.log("Código:", arti.codArt);
+      console.log("Nombre:", arti.nomArt);
+      console.log("Precio:", arti.precioVenta);
+      console.log("Stock:", arti.stock);
+      console.log("Proveedor:", arti.proveedorDTO);
+      console.log("Proveedor ID:", arti.proveedorDTO?.id);
+      console.log("Proveedor Nombre:", arti.proveedorDTO?.nomProv);
+      console.log("==========================");
+
       const isNew = arti.id === 0;
       if (isNew) {
         await ArticuloService.createArticulo(arti);
@@ -155,6 +177,7 @@ const ArticuloModal = ({
         art.desviacionEstandarUsoPeriodoEntrega || 1,
       desviacionEstandarDurantePeriodoRevisionEntrega:
         art.desviacionEstandarDurantePeriodoRevisionEntrega || 1,
+      proveedorDTO: art.proveedorDTO || null,
     },
     validationSchema: validationSchema,
     validateOnChange: true,
@@ -387,11 +410,12 @@ const ArticuloModal = ({
                 <Form.Label>Proveedor</Form.Label>
                 <Form.Control
                   as="select"
-                  name="proveedorDTO.id"
-                  value={formik.values.proveedorDTO?.id || ""}
+                  value={selectedProveedorCod}
                   onChange={(e) => {
+                    const proveedorCod = e.target.value;
+                    setSelectedProveedorCod(proveedorCod);
                     const selectedProveedor = proveedores.find(
-                      (prov) => prov.id === Number(e.target.value)
+                      (prov) => prov.codProv === proveedorCod
                     );
                     formik.setFieldValue(
                       "proveedorDTO",
@@ -405,46 +429,17 @@ const ArticuloModal = ({
                   }
                 >
                   <option value="">Seleccione un proveedor</option>
-                  {filteredProveedores.map((proveedor) => (
-                    <option key={proveedor.id} value={proveedor.id}>
+                  {filteredProveedores.map((proveedor, index) => (
+                    <option
+                      key={`proveedor-${index}`}
+                      value={proveedor.codProv}
+                    >
                       {proveedor.nomProv}
                     </option>
                   ))}
                 </Form.Control>
                 {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
                   <div style={{ color: "red" }}>Error en el proveedor</div>
-                )}
-              </Form.Group>
-              <Form.Group controlId="formArticuloElegido">
-                <Form.Label>Proveedor</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="proveedorDTO.id"
-                  value={formik.values.proveedorDTO?.id || ""}
-                  onChange={(e) => {
-                    const selectedProveedor = proveedores.find(
-                      (art) => art.id === Number(e.target.value)
-                    );
-                    formik.setFieldValue(
-                      "proveedorDTO",
-                      selectedProveedor || null
-                    );
-                  }}
-                  isInvalid={
-                    !!(
-                      formik.errors.proveedorDTO && formik.touched.proveedorDTO
-                    )
-                  }
-                >
-                  <option value="">Seleccione un proveedor</option>
-                  {filteredProveedores.map((proveedor) => (
-                    <option key={proveedor.id} value={proveedor.id}>
-                      {proveedor.nomProv}
-                    </option>
-                  ))}
-                </Form.Control>
-                {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
-                  <div style={{ color: "red" }}>Error en el artículo</div>
                 )}
               </Form.Group>
 
