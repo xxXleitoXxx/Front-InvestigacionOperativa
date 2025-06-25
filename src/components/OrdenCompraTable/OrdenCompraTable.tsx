@@ -7,6 +7,7 @@ import { DeleteButton } from "../DeleteButton/DeleteButton";
 import type { OrdenCompraDTO } from "../../types/OrdenCompraDTO";
 import { OrdenCompraService } from "../../services/OrdenCompraService";
 import OrdenCompraModal from "../OrdenCompraModal/OrdenCompraModal";
+import { toast } from "react-toastify";
 
 const OrdenCompraTable = () => {
   // Constante para inicializar un artículo por defecto y evitar el undefined
@@ -48,10 +49,22 @@ const OrdenCompraTable = () => {
 
   const clickBotton = async () => {
     try {
+      setIsLoading(true);
+      console.log('Iniciando generación de pedidos...');
       await OrdenCompraService.crearOCPedidoFijo();
+      toast.success('Pedidos generados con éxito');
       console.log('Orden de compra creada con éxito');
+      // Refrescar los datos después de generar los pedidos
+      setRefreshData(prev => !prev);
     } catch (error) {
       console.error('Error al crear la orden de compra:', error);
+      toast.error(
+        `Error al generar pedidos: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    } finally {
+      setIsLoading(false);
     }
   }
   
@@ -88,11 +101,10 @@ const OrdenCompraTable = () => {
         Nuevo Orden de compra
       </Button>
       <Button
-      onClick={() =>
-        clickBotton
-      }
+      onClick={clickBotton}
+      disabled={isLoading}
       >
-        Generar Pedidos 
+        {isLoading ? 'Generando...' : 'Generar Pedidos'}
       </Button>
       {isLoading ? (
               <div>

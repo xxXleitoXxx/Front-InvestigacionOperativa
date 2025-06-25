@@ -3,7 +3,6 @@ import AltaAlumno from "../components/AbmAlumno/AltaAlumno";
 
 import AbmAlumno from "../pages/AbmAlumno";
 import PaginaPrincipal from "../pages/Main";
-import PaginaProps from "../pages/PaginaProps";
 import ProveedorTable from "../components/ProveedorTable/ProveedorTable";
 import ArticuloTable from "../components/ArticuloTable/ArticuloTable";
 import OrdenCompraTable from "../components/OrdenCompraTable/OrdenCompraTable";
@@ -18,7 +17,6 @@ function Aplicacion() {
           <Route path="ordenCompra" element={<OrdenCompraTable />} />
           <Route path="altaalumno" element={<AltaAlumno />} />
           <Route path="venta" element={<VentaTable />} />
-          <Route path="paginaProps" element={<PaginaProps />} />
           <Route path="abmprueba" element={<ProveedorTable />} />
           <Route path="maestroArticulos" element={<ArticuloTable />} />
         </Routes>

@@ -23,10 +23,25 @@ const handleResponse = async (response: Response) => {
     throw new Error(errorMessage);
   }
 
+  // Obtener el texto de la respuesta
+  const responseText = await response.text();
+  
+  // Si la respuesta está vacía, devolver un objeto de éxito
+  if (!responseText || responseText.trim() === '') {
+    console.log("Respuesta vacía del servidor, considerando como éxito");
+    return { message: "Operación completada con éxito" };
+  }
+
   if (contentType && contentType.includes('application/json')) {
-    return response.json();
+    try {
+      return JSON.parse(responseText);
+    } catch (error) {
+      console.error("Error parsing JSON response:", error);
+      console.log("Respuesta del servidor:", responseText);
+      return { message: responseText };
+    }
   } else {
-    return response.text();
+    return { message: responseText };
   }
 };
 
@@ -53,7 +68,7 @@ export const ProveedorService = {
 
   createProveedor: async (proveedor: ProveedorDTO): Promise<ProveedorDTO> => {
     try {
-      const response = await fetch(`${BASE_URL}/Proveedor`, {
+      const response = await fetch(`${BASE_URL}/Proveedor/altaProveedor`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -67,18 +82,25 @@ export const ProveedorService = {
     }
   },
 
-  updateProveedor: async (id: number, proveedor: ProveedorDTO): Promise<ProveedorDTO> => {
+  updateProveedor: async (proveedor: ProveedorDTO): Promise<ProveedorDTO> => {
     try {
-      const response = await fetch(`${BASE_URL}/Proveedor/${id}`, {
+      console.log('Enviando proveedor a actualizar:', JSON.stringify(proveedor, null, 2));
+      console.log('URL del endpoint:', `${BASE_URL}/Proveedor/modificarProveedor`);
+      
+      const response = await fetch(`${BASE_URL}/Proveedor/modificarProveedor`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(proveedor)
       });
+      
+      console.log('Respuesta del servidor:', response.status, response.statusText);
+      console.log('Headers de respuesta:', Object.fromEntries(response.headers.entries()));
+      
       return await handleResponse(response);
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.error("Error detallado en updateProveedor:", error);
       throw error;
     }
   },

@@ -22,9 +22,6 @@ function Navegacion() {
               <Nav.Link onClick={() => navigate("/venta")}>
                 Ventas
                 </Nav.Link>
-              <Nav.Link onClick={() => navigate("/paginaProps")}>
-                PaginaProps
-              </Nav.Link>
               <Nav.Link onClick={() => navigate("/abmprueba")}>
                 Proveedores
               </Nav.Link>

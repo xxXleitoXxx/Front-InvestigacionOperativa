@@ -82,7 +82,7 @@ const ProveedorTable = () => {
       >
         Nuevo Proveedor
       </Button>
-      
+
       {isLoading ? (
         <Loader />
       ) : (

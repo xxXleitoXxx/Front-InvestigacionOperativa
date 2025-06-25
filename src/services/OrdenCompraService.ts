@@ -14,7 +14,18 @@ const handleResponse = async (response: Response) => {
     }
     throw new Error(errorMessage);
   }
-  return response.json();
+  
+  // Obtener el texto de la respuesta
+  const responseText = await response.text();
+  
+  // Intentar parsear como JSON, si falla, devolver el texto como está
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    // Si no es JSON válido, devolver el texto como respuesta
+    console.log("Respuesta del servidor (no JSON):", responseText);
+    return { message: responseText };
+  }
 };
 
 export const OrdenCompraService = {
