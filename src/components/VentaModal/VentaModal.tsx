@@ -4,11 +4,6 @@ import { ModalType } from "../../types/ModalType";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
-import { ProveedorService } from "../../services/ProveedorService";
-import type { ProveedorDTO } from "../../types/ProveedorDTO";
-import type { ProveedorArticuloDTO } from "../../types/ProveedorArticuloDTO";
-import ProveedorArticuloModal from "../ProveedorArticuloModal/ProveedorArticuloModal";
-import { TipoLote } from "../../types/TipoLote";
 import type { VentaDTO } from "../../types/VentaDto";
 import type { VentaArticuloDTO } from "../../types/VentaArticuloDTO";
 import { VentaService } from "../../services/VentaService";
@@ -161,6 +156,25 @@ const VentaModal = ({
     articulo.nomArt.toLowerCase().includes(articuloSearch.toLowerCase())
   );
 
+  const handleAddArticulo = () => {
+    setSelectedArticulo(null);
+    formik.setFieldValue('ventaArticuloDTOS', [
+      ...formik.values.ventaArticuloDTOS,
+      {
+        articuloDTO: { id: 0 },
+        cantArtVentDTO: 0,
+        montoArt: 0,
+        id: 0
+      }
+    ]);
+  };
+
+  const handleRemoveArticulo = (index: number) => {
+    const updated = [...formik.values.ventaArticuloDTOS];
+    updated.splice(index, 1);
+    formik.setFieldValue('ventaArticuloDTOS', updated);
+  };
+
   return (
     
         <Modal show={show} onHide={onHide}>
@@ -169,87 +183,79 @@ const VentaModal = ({
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={formik.handleSubmit}>
-              {/* 1. Filtro de artículo */}
-              <Form.Group>
-                <Form.Label>Buscar artículo</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar artículo..."
-                  value={articuloSearch}
-                  onChange={(e) => setArticuloSearch(e.target.value)}
-                />
-              </Form.Group>
-    
-              {/* 2. Select de artículo */}
-              <Form.Group>
-                <Form.Label>Artículos</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="ventaArticuloDTOS[0].articuloDTO.id"
-                  onChange={(e) => {
-                    const selectedArticulo = articulos.find(
-                      (art) => art.id === Number(e.target.value)
-                    );
-                    setSelectedArticulo(selectedArticulo || null);
-                    
-                    // Actualizar el artId en el formulario
-                    const artId = Number(e.target.value);
-                    formik.setFieldValue('ventaArticuloDTOS[0].articuloDTO.id', artId);
-                    console.log('Artículo seleccionado:', selectedArticulo, 'artId asignado:', artId);
-                    
-                    // Calcular el monto del artículo si hay cantidad
-                    if (selectedArticulo && formik.values.ventaArticuloDTOS[0].cantArtVentDTO > 0) {
-                      const montoArt = selectedArticulo.precioVenta * formik.values.ventaArticuloDTOS[0].cantArtVentDTO;
-                      formik.setFieldValue('ventaArticuloDTOS[0].montoArt', montoArt);
-                    }
-                  }}
-                  value={formik.values.ventaArticuloDTOS[0].articuloDTO.id || ""}
-                >
-                  <option value="">Seleccione un artículo</option>
-                  {filteredArticulos.map((articulo) => (
-                    <option key={articulo.id} value={articulo.id}>
-                      {articulo.nomArt} - ${articulo.precioVenta}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-    
-              {/* 3. Cantidad */}
-              <Form.Group>
-            <Form.Label>Cantidad a pedir</Form.Label>
-            <Form.Control
-              type="number"
-              name="ventaArticuloDTOS[0].cantArtVentDTO"
-              value={formik.values.ventaArticuloDTOS[0].cantArtVentDTO}
-              onChange={(e) => {
-                const cantidad = Number(e.target.value);
-                formik.setFieldValue('ventaArticuloDTOS[0].cantArtVentDTO', cantidad);
-                
-                // Calcular el monto del artículo si hay artículo seleccionado
-                if (selectedArticulo && cantidad > 0) {
-                  const montoArt = selectedArticulo.precioVenta * cantidad;
-                  formik.setFieldValue('ventaArticuloDTOS[0].montoArt', montoArt);
-                }
-              }}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.ventaArticuloDTOS && formik.errors.ventaArticuloDTOS && 
-             typeof formik.errors.ventaArticuloDTOS === 'string' ? (
-              <div className="text-danger">{formik.errors.ventaArticuloDTOS}</div>
-            ) : null}
-          </Form.Group>
-          
-          {/* 4. Mostrar monto del artículo */}
-          {formik.values.ventaArticuloDTOS[0].montoArt > 0 && (
-            <Form.Group>
-              <Form.Label>Monto del artículo</Form.Label>
-              <Form.Control
-                type="text"
-                value={`$${formik.values.ventaArticuloDTOS[0].montoArt}`}
-                readOnly
-              />
-            </Form.Group>
-          )}
+              {/* 1. Filtro de artículo y lista dinámica */}
+              {formik.values.ventaArticuloDTOS.map((ventaArticulo, idx) => {
+                const selectedArt = articulos.find(
+                  (art) => art.id === ventaArticulo.articuloDTO.id
+                );
+                return (
+                  <div key={idx} style={{ border: '1px solid #eee', padding: 10, marginBottom: 10, borderRadius: 6 }}>
+                    <Form.Group>
+                      <Form.Label>Artículos</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name={`ventaArticuloDTOS[${idx}].articuloDTO.id`}
+                        onChange={(e) => {
+                          const artId = Number(e.target.value);
+                          formik.setFieldValue(`ventaArticuloDTOS[${idx}].articuloDTO.id`, artId);
+                          // Si hay cantidad, recalcula el monto
+                          const art = articulos.find((a) => a.id === artId);
+                          if (art && ventaArticulo.cantArtVentDTO > 0) {
+                            const montoArt = art.precioVenta * ventaArticulo.cantArtVentDTO;
+                            formik.setFieldValue(`ventaArticuloDTOS[${idx}].montoArt`, montoArt);
+                          }
+                        }}
+                        value={ventaArticulo.articuloDTO.id || ""}
+                      >
+                        <option value="">Seleccione un artículo</option>
+                        {articulos.map((articulo) => (
+                          <option key={articulo.id} value={articulo.id}>
+                            {articulo.nomArt} - ${articulo.precioVenta}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Cantidad a pedir</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name={`ventaArticuloDTOS[${idx}].cantArtVentDTO`}
+                        value={ventaArticulo.cantArtVentDTO}
+                        onChange={(e) => {
+                          const cantidad = Number(e.target.value);
+                          formik.setFieldValue(`ventaArticuloDTOS[${idx}].cantArtVentDTO`, cantidad);
+                          // Si hay artículo seleccionado, recalcula el monto
+                          if (selectedArt && cantidad > 0) {
+                            const montoArt = selectedArt.precioVenta * cantidad;
+                            formik.setFieldValue(`ventaArticuloDTOS[${idx}].montoArt`, montoArt);
+                          }
+                        }}
+                        onBlur={formik.handleBlur}
+                      />
+                    </Form.Group>
+                    {/* Mostrar monto del artículo */}
+                    {ventaArticulo.montoArt > 0 && (
+                      <Form.Group>
+                        <Form.Label>Monto del artículo</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={`$${ventaArticulo.montoArt}`}
+                          readOnly
+                        />
+                      </Form.Group>
+                    )}
+                    {/* Botón eliminar artículo */}
+                    {formik.values.ventaArticuloDTOS.length > 1 && (
+                      <Button variant="danger" size="sm" onClick={() => handleRemoveArticulo(idx)} style={{ marginTop: 8 }}>
+                        Eliminar artículo
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+              <Button variant="success" onClick={handleAddArticulo} style={{ marginBottom: 12 }}>
+                + Agregar otro artículo
+              </Button>
               <Modal.Footer>
                               <Button variant="secondary" onClick={onHide}>
                                 Cancelar

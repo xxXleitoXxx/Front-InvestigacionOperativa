@@ -69,13 +69,39 @@ const OrdenCompraModal = ({
     fetchProveedores();
   }, []);
 
-  const handleSaveUpdate = async (orden: OrdenCompraDTO) => {
+  const handleSaveUpdate = async (ordenFormik: OrdenCompraDTO) => {
     try {
-      const isNew = orden.id === 0;
+      if (!ordenFormik.articuloDTO || !ordenFormik.proveedorDTO) {
+        toast.error("Debe seleccionar un artículo y un proveedor.");
+        return;
+      }
+      let orden;
+      const isNew = !ordenFormik.id || ordenFormik.id === 0;
       if (isNew) {
+        orden = {
+          articuloDTO: {
+            id: ordenFormik.articuloDTO.id,
+            proveedorDTO: {
+              id: ordenFormik.proveedorDTO.id,
+              nomProv: ordenFormik.proveedorDTO.nomProv,
+            },
+          },
+          estadoOrdenCompraDTO: { id: 1 },
+          cantPedida: ordenFormik.cantPedida,
+          proveedorDTO: {
+            id: ordenFormik.proveedorDTO.id,
+            nomProv: ordenFormik.proveedorDTO.nomProv,
+          },
+          fecha: ordenFormik.fecha || new Date().toISOString().slice(0, 10),
+        } as any;
         await OrdenCompraService.createOrdenCompra(orden);
       } else {
-        await OrdenCompraService.updateOrdenCompra(orden.id, orden);
+        orden = {
+          ...ordenFormik,
+          articuloDTO: { id: ordenFormik.articuloDTO.id },
+          proveedorDTO: { id: ordenFormik.proveedorDTO.id },
+        } as any;
+        await OrdenCompraService.updateOrdenCompra(ordenFormik.id, orden);
       }
       toast.success(
         isNew ? "Orden de Compra creada con éxito" : "Orden de Compra actualizada con éxito",
@@ -138,17 +164,6 @@ const OrdenCompraModal = ({
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={formik.handleSubmit}>
-          {/* 1. Filtro de artículo */}
-          <Form.Group>
-            <Form.Label>Buscar artículo</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Buscar artículo..."
-              value={articuloSearch}
-              onChange={(e) => setArticuloSearch(e.target.value)}
-            />
-          </Form.Group>
-
           {/* 2. Select de artículo */}
           <Form.Group>
             <Form.Label>Artículos</Form.Label>
@@ -161,12 +176,13 @@ const OrdenCompraModal = ({
                 );
                 if (selectedArticulo) {
                   addArticuloToProveedor(selectedArticulo);
+                  formik.setFieldValue("articuloDTO", selectedArticulo);
                 }
               }}
               value={selectedArticulo?.id || ""}
             >
               <option value="">Seleccione un artículo</option>
-              {filteredArticulos.map((articulo) => (
+              {articulos.map((articulo) => (
                 <option key={articulo.id} value={articulo.id}>
                   {articulo.nomArt}
                 </option>
@@ -190,16 +206,6 @@ const OrdenCompraModal = ({
           </Form.Group>
 
           {/* 4. Proveedor */}
-           <Form.Group controlId="formProveedorSearch">
-                          <Form.Label>Buscar Proveedor</Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Buscar proveedor..."
-                            value={proveedorSearch}
-                            onChange={(e) => setProveedorSearch(e.target.value)}
-                          />
-                        </Form.Group>
-                        
           <Form.Group controlId="formProveedorElegido">
                           <Form.Label>Proveedor</Form.Label>
                           <Form.Control
@@ -210,6 +216,7 @@ const OrdenCompraModal = ({
                               const selectedProveedor = proveedores.find(
                                 (prov) => prov.id === Number(e.target.value)
                               );
+                              setSelectedProveedor(selectedProveedor || null);
                               formik.setFieldValue(
                                 "proveedorDTO",
                                 selectedProveedor || null
@@ -240,9 +247,9 @@ const OrdenCompraModal = ({
               as="textarea"
               rows={3}
               value={
-                selectedProveedorArticulo
-                  ? `Precio: ${selectedProveedorArticulo.costoUnitario}, Demora: ${selectedProveedorArticulo.demoraEntrega}`
-                  : "Seleccione un artículo y un proveedor para ver la información"
+                selectedProveedorArticulo && formik.values.cantPedida > 0
+                  ? `Precio unitario: $${selectedProveedorArticulo.costoUnitario}\nDemora: ${selectedProveedorArticulo.demoraEntrega}\nMonto total: $${(selectedProveedorArticulo.costoUnitario * formik.values.cantPedida).toFixed(2)}`
+                  : "Seleccione un artículo, un proveedor y una cantidad para ver la información"
               }
               readOnly
             />
