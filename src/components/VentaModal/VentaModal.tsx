@@ -122,6 +122,28 @@ const VentaModal = ({
 
   const validationSchema = Yup.object().shape({
     id: Yup.number().integer().min(0),
+    ventaArticuloDTOS: Yup.array().of(
+      Yup.object().shape({
+        articuloDTO: Yup.object().shape({
+          id: Yup.number().required("Debe seleccionar un artículo")
+        }),
+        cantArtVentDTO: Yup.number().min(1, "La cantidad debe ser al menos 1").required("La cantidad es requerida"),
+        montoArt: Yup.number().min(0)
+      })
+    ).test(
+      'no-duplicate-articles',
+      'No puede haber artículos duplicados',
+      function(value) {
+        if (!value) return true;
+        
+        const articuloIds = value
+          .map(item => item.articuloDTO?.id)
+          .filter(id => id && id !== 0);
+        
+        const uniqueIds = new Set(articuloIds);
+        return uniqueIds.size === articuloIds.length;
+      }
+    )
   });
 
  const formik = useFormik({
@@ -175,6 +197,20 @@ const VentaModal = ({
     formik.setFieldValue('ventaArticuloDTOS', updated);
   };
 
+  // Función para verificar si un artículo ya está seleccionado en otro índice
+  const isArticuloAlreadySelected = (articuloId: number, currentIndex: number) => {
+    return formik.values.ventaArticuloDTOS.some((ventaArticulo, index) => 
+      index !== currentIndex && ventaArticulo.articuloDTO.id === articuloId
+    );
+  };
+
+  // Función para obtener artículos disponibles (no seleccionados en otros índices)
+  const getAvailableArticulos = (currentIndex: number) => {
+    return articulos.filter(articulo => 
+      !isArticuloAlreadySelected(articulo.id, currentIndex)
+    );
+  };
+
   return (
     
         <Modal show={show} onHide={onHide}>
@@ -198,6 +234,14 @@ const VentaModal = ({
                         onChange={(e) => {
                           const artId = Number(e.target.value);
                           formik.setFieldValue(`ventaArticuloDTOS[${idx}].articuloDTO.id`, artId);
+                          
+                          // Validar si el artículo ya está seleccionado en otro índice
+                          if (artId !== 0 && isArticuloAlreadySelected(artId, idx)) {
+                            toast.error("Este artículo ya está seleccionado en otra línea");
+                            formik.setFieldValue(`ventaArticuloDTOS[${idx}].articuloDTO.id`, 0);
+                            return;
+                          }
+                          
                           // Si hay cantidad, recalcula el monto
                           const art = articulos.find((a) => a.id === artId);
                           if (art && ventaArticulo.cantArtVentDTO > 0) {
@@ -208,7 +252,7 @@ const VentaModal = ({
                         value={ventaArticulo.articuloDTO.id || ""}
                       >
                         <option value="">Seleccione un artículo</option>
-                        {articulos.map((articulo) => (
+                        {getAvailableArticulos(idx).map((articulo) => (
                           <option key={articulo.id} value={articulo.id}>
                             {articulo.nomArt} - ${articulo.precioVenta}
                           </option>

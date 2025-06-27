@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import type { ModalType } from "../../types/ModalType";
 import type { OrdenCompraDTO } from "../../types/OrdenCompraDTO";
-import type { ArticuloDTO } from "../../types/ArticuloDTO";
+import type { ArticuloOCDTO } from "../../types/ArticuloOCDTO";
 import { OrdenCompraService } from "../../services/OrdenCompraService";
 import { ProveedorService } from "../../services/ProveedorService";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
@@ -28,11 +28,11 @@ const OrdenCompraModal = ({
   orden,
   refreshData,
 }: OrdenCompraModalProps) => {
-  const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
+  const [articulos, setArticulos] = useState<ArticuloOCDTO[]>([]);
   const [articuloSearch, setArticuloSearch] = useState("");
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
-  const [selectedArticulo, setSelectedArticulo] = useState<ArticuloDTO | null>(null);
+  const [selectedArticulo, setSelectedArticulo] = useState<ArticuloOCDTO | null>(null);
   const [selectedProveedor, setSelectedProveedor] = useState<ProveedorDTO | null>(null);
 
   useEffect(() => {
@@ -81,10 +81,7 @@ const OrdenCompraModal = ({
         orden = {
           articuloDTO: {
             id: ordenFormik.articuloDTO.id,
-            proveedorDTO: {
-              id: ordenFormik.proveedorDTO.id,
-              nomProv: ordenFormik.proveedorDTO.nomProv,
-            },
+            nomArt: ordenFormik.articuloDTO.nomArt,
           },
           estadoOrdenCompraDTO: { id: 1 },
           cantPedida: ordenFormik.cantPedida,
@@ -92,13 +89,16 @@ const OrdenCompraModal = ({
             id: ordenFormik.proveedorDTO.id,
             nomProv: ordenFormik.proveedorDTO.nomProv,
           },
-          fecha: ordenFormik.fecha || new Date().toISOString().slice(0, 10),
+          fecha: ordenFormik.fechaPedida || new Date().toISOString().slice(0, 10),
         } as any;
         await OrdenCompraService.createOrdenCompra(orden);
       } else {
         orden = {
           ...ordenFormik,
-          articuloDTO: { id: ordenFormik.articuloDTO.id },
+          articuloDTO: { 
+            id: ordenFormik.articuloDTO.id,
+            nomArt: ordenFormik.articuloDTO.nomArt,
+          },
           proveedorDTO: { id: ordenFormik.proveedorDTO.id },
         } as any;
         await OrdenCompraService.updateOrdenCompra(ordenFormik.id, orden);
@@ -131,7 +131,7 @@ const OrdenCompraModal = ({
     )
   );
 
-  const addArticuloToProveedor = (articulo: ArticuloDTO) => {
+  const addArticuloToProveedor = (articulo: ArticuloOCDTO) => {
     setSelectedArticulo(articulo);
   };
 
@@ -179,7 +179,7 @@ const OrdenCompraModal = ({
                   formik.setFieldValue("articuloDTO", selectedArticulo);
                 }
               }}
-              value={selectedArticulo?.id || ""}
+              value={selectedArticulo?.id?.toString() ?? ""}
             >
               <option value="">Seleccione un artículo</option>
               {articulos.map((articulo) => (

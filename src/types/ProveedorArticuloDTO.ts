@@ -1,4 +1,4 @@
-import type { ArticuloDTO } from "./ArticuloDTO";
+import type { ArticuloOCDTO } from "./ArticuloOCDTO";
 import type { TipoLote } from "./TipoLote";
 
 export interface ProveedorArticuloDTO {
@@ -16,5 +16,5 @@ export interface ProveedorArticuloDTO {
     inventarioMaximo: number;
     periodoRevision: number;//se carga
     TipoLote: TipoLote; // Se carga
-    articuloDTO: ArticuloDTO;
+    articuloDTO: ArticuloOCDTO;
 }
