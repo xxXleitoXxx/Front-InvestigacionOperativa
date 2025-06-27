@@ -1,14 +1,15 @@
-import  type { ArticuloDTO } from './ArticuloDTO';
-import  type { EstadoOrdenCompraDTO } from './EstadoOrdenCompraDTO';
-import type { ProveedorDTO } from './ProveedorDTO';
+import type { ArticuloOCDTO } from "./ArticuloOCDTO";
+import type { EstadoOrdenCompraDTO } from "./EstadoOrdenCompraDTO";
+import type { ProveedorOCDTO } from "./ProveedorOCDTO";
 
 export interface OrdenCompraDTO {
-  find(arg0: (prov: any) => boolean): unknown;
   id: number;
-  montototal: number;
-  fechaPedida : String;
-  articuloDTO: ArticuloDTO |null;
-  estadoOrdenCompraDTO: EstadoOrdenCompraDTO |null;
+  articuloDTO: ArticuloOCDTO;
+  estadoOrdenCompraDTO: EstadoOrdenCompraDTO;
   cantPedida: number;
-  proveedorDTO: ProveedorDTO |null;
+  proveedorDTO: ProveedorOCDTO;
+  fecha: string; // formato ISO, ej: "2025-06-26"
+  montoTotal: number;
+  fechaPedidoOrdCom: string; // LocalDateTime → string ISO
+  fechaLlegadaOrdCom: string;
 }

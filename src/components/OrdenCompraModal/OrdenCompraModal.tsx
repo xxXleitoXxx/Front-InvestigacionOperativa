@@ -18,6 +18,9 @@ type OrdenCompraModalProps = {
   modalType: ModalType;
   orden: OrdenCompraDTO;
   refreshData: React.Dispatch<React.SetStateAction<boolean>>;
+  handleOrdenPendiente?: (ordenCompra: OrdenCompraDTO) => Promise<void>;
+  handleOrdenEnProceso?: (ordenCompra: OrdenCompraDTO) => Promise<void>;
+  handleOrdenFinalizada?: (ordenCompra: OrdenCompraDTO) => Promise<void>;
 };
 
 const OrdenCompraModal = ({
@@ -27,6 +30,9 @@ const OrdenCompraModal = ({
   modalType,
   orden,
   refreshData,
+  handleOrdenPendiente,
+  handleOrdenEnProceso,
+  handleOrdenFinalizada,
 }: OrdenCompraModalProps) => {
   const [articulos, setArticulos] = useState<ArticuloOCDTO[]>([]);
   const [articuloSearch, setArticuloSearch] = useState("");
@@ -87,6 +93,7 @@ const OrdenCompraModal = ({
 
       let orden;
       const isNew = !ordenFormik.id || ordenFormik.id === 0;
+      
       if (isNew) {
         orden = {
           articuloDTO: {
@@ -100,11 +107,12 @@ const OrdenCompraModal = ({
             id: ordenFormik.proveedorDTO.id,
             nomProv: ordenFormik.proveedorDTO.nomProv,
           },
-          fecha: ordenFormik.fechaPedida || new Date().toISOString().slice(0, 10),
+          fechaPedidoOrdCom: new Date().toISOString(),
         } as any;
         await OrdenCompraService.createOrdenCompra(orden);
       } else {
-        orden = {
+        // Para actualizaciones, usar la función específica del estado
+        const ordenActualizada = {
           ...ordenFormik,
           articuloDTO: { 
             id: ordenFormik.articuloDTO.id,
@@ -113,8 +121,37 @@ const OrdenCompraModal = ({
           montototal: montoTotal,
           proveedorDTO: { id: ordenFormik.proveedorDTO.id },
         } as any;
-        await OrdenCompraService.updateOrdenCompra(ordenFormik.id, orden);
+
+        // Determinar qué función usar basándose en el estado actual
+        const estadoId = ordenFormik.estadoOrdenCompraDTO?.id;
+        
+        switch (estadoId) {
+          case 1: // Pendiente
+            if (handleOrdenPendiente) {
+              await handleOrdenPendiente(ordenActualizada);
+            } else {
+              await OrdenCompraService.updateOrdenCompra(ordenFormik.id, ordenActualizada);
+            }
+            break;
+          case 2: // En proceso
+            if (handleOrdenEnProceso) {
+              await handleOrdenEnProceso(ordenActualizada);
+            } else {
+              await OrdenCompraService.updateOrdenCompra(ordenFormik.id, ordenActualizada);
+            }
+            break;
+          case 3: // Finalizada
+            if (handleOrdenFinalizada) {
+              await handleOrdenFinalizada(ordenActualizada);
+            } else {
+              await OrdenCompraService.updateOrdenCompra(ordenFormik.id, ordenActualizada);
+            }
+            break;
+          default:
+            await OrdenCompraService.updateOrdenCompra(ordenFormik.id, ordenActualizada);
+        }
       }
+      
       toast.success(
         isNew ? "Orden de Compra creada con éxito" : "Orden de Compra actualizada con éxito",
         {
