@@ -26,18 +26,33 @@ const handleResponse = async (response: Response) => {
   // Obtener el texto de la respuesta
   const responseText = await response.text();
   
-  // Si la respuesta está vacía, devolver un objeto de éxito
+  // Si la respuesta está vacía, devolver un array vacío
   if (!responseText || responseText.trim() === '') {
-    console.log("Respuesta vacía del servidor, considerando como éxito");
-    return { message: "Operación completada con éxito" };
+    return [];
   }
 
   if (contentType && contentType.includes('application/json')) {
     try {
-      return JSON.parse(responseText);
+      const parsed = JSON.parse(responseText);
+      
+      // Si la respuesta es un array, devolverlo directamente
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+      
+      // Si es un objeto, buscar arrays dentro de él
+      if (parsed && typeof parsed === 'object') {
+        for (const key in parsed) {
+          if (Array.isArray(parsed[key])) {
+            return parsed[key];
+          }
+        }
+      }
+      
+      // Si no encontramos un array, devolver el objeto como está
+      return parsed;
     } catch (error) {
       console.error("Error parsing JSON response:", error);
-      console.log("Respuesta del servidor:", responseText);
       return { message: responseText };
     }
   } else {

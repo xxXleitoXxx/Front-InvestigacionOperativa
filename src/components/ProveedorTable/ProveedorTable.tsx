@@ -57,10 +57,11 @@ const ProveedorTable = () => {
       try {
         const proveedores = await ProveedorService.getProveedores();
         setProveedores(proveedores);
+        setIsLoading(false); // Solo ocultar loader cuando la promesa se resuelva exitosamente
       } catch (error) {
         console.error("Error al obtener proveedores:", error);
-      } finally {
-        setIsLoading(false);
+        setProveedores([]); // Establecer array vacío en caso de error
+        // No ocultar el loader en caso de error para que el usuario vea que hay un problema
       }
     };
     fetchProveedores();

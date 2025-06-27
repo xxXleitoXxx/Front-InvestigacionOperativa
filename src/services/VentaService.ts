@@ -8,7 +8,6 @@ const handleResponse = async (response: Response) => {
     let errorMessage = `Error: ${response.statusText}`;
     try {
       const errorData = await response.json();
-      // Asumiendo que el error tiene un formato como { error: "Mensaje de error" }
       errorMessage = errorData.error || JSON.stringify(errorData);
     } catch (error) {
       console.error("Error parsing error response:", error);
@@ -19,12 +18,33 @@ const handleResponse = async (response: Response) => {
   // Obtener el texto de la respuesta
   const responseText = await response.text();
   
-  // Intentar parsear como JSON, si falla, devolver el texto como está
+  // Si la respuesta está vacía, devolver un array vacío
+  if (!responseText || responseText.trim() === '') {
+    return [];
+  }
+  
+  // Intentar parsear como JSON
   try {
-    return JSON.parse(responseText);
+    const parsed = JSON.parse(responseText);
+    
+    // Si la respuesta es un array, devolverlo directamente
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    
+    // Si es un objeto, buscar arrays dentro de él
+    if (parsed && typeof parsed === 'object') {
+      for (const key in parsed) {
+        if (Array.isArray(parsed[key])) {
+          return parsed[key];
+        }
+      }
+    }
+    
+    // Si no encontramos un array, devolver el objeto como está
+    return parsed;
   } catch (error) {
-    // Si no es JSON válido, devolver el texto como respuesta
-    console.log("Respuesta del servidor (no JSON):", responseText);
+    console.error("Error parsing JSON:", error);
     return { message: responseText };
   }
 };

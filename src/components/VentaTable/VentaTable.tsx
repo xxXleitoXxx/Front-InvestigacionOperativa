@@ -56,10 +56,11 @@ const VentaTable = () => {
       try {
         const ventas = await VentaService.getVentas();
         setVentas(ventas);
+        setIsLoading(false); // Solo ocultar loader cuando la promesa se resuelva exitosamente
       } catch (error) {
-        console.error("Error al obtener proveedores:", error);
-      } finally {
-        setIsLoading(false);
+        console.error("Error al obtener ventas:", error);
+        setVentas([]); // Establecer array vacío en caso de error
+        // No ocultar el loader en caso de error para que el usuario vea que hay un problema
       }
     };
     fetchVenta();
