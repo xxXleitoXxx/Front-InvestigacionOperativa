@@ -67,9 +67,29 @@ const OrdenCompraTable = () => {
       setIsLoading(false);
     }
   }
-  
 
-
+  const handleCancelarOrden = async (ordenCompra: OrdenCompraDTO) => {
+    try {
+      setIsLoading(true);
+      // Actualizar el estado de la orden a cancelada (id: 4)
+      const ordenCancelada = {
+        ...ordenCompra,
+        estadoOrdenCompraDTO: { id: 4, nomEOC: "Cancelada" }
+      };
+      await OrdenCompraService.cancelarOrdenCompra(ordenCancelada);
+      toast.success('Orden de compra cancelada con éxito');
+      setRefreshData(prev => !prev);
+    } catch (error) {
+      console.error('Error al cancelar la orden de compra:', error);
+      toast.error(
+        `Error al cancelar la orden: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Variable que va a contener los datos recibidos de la API
   const [ordencompras, setOrdenCompras] = useState<OrdenCompraDTO[]>([]);
@@ -122,7 +142,7 @@ const OrdenCompraTable = () => {
               <th>Fecha Pedida</th>
               <th>Estado</th>
               <th>Editar</th>
-              <th>Eliminar</th>
+              <th>Cancelar</th>
             </tr>
           </thead>
           <tbody>
@@ -143,11 +163,14 @@ const OrdenCompraTable = () => {
                   />
                 </td>
                 <td>
-                  <DeleteButton
-                    onClick={() =>
-                      handleClick("Borrar Artículo", OC, ModalType.DELETE)
-                    }
-                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleCancelarOrden(OC)}
+                    disabled={isLoading}
+                  >
+                    Cancelar
+                  </Button>
                 </td>
               </tr>
             ))}

@@ -75,6 +75,16 @@ const OrdenCompraModal = ({
         toast.error("Debe seleccionar un artículo y un proveedor.");
         return;
       }
+
+      // Calcular el monto total
+      const selectedProveedorArticulo = selectedProveedor?.proveedorArticulos.find(
+        (pa) => pa.articuloDTO.id === ordenFormik.articuloDTO?.id
+      );
+      
+      const montoTotal = selectedProveedorArticulo 
+        ? selectedProveedorArticulo.costoUnitario * ordenFormik.cantPedida
+        : 0;
+
       let orden;
       const isNew = !ordenFormik.id || ordenFormik.id === 0;
       if (isNew) {
@@ -85,6 +95,7 @@ const OrdenCompraModal = ({
           },
           estadoOrdenCompraDTO: { id: 1 },
           cantPedida: ordenFormik.cantPedida,
+          montototal: montoTotal,
           proveedorDTO: {
             id: ordenFormik.proveedorDTO.id,
             nomProv: ordenFormik.proveedorDTO.nomProv,
@@ -99,6 +110,7 @@ const OrdenCompraModal = ({
             id: ordenFormik.articuloDTO.id,
             nomArt: ordenFormik.articuloDTO.nomArt,
           },
+          montototal: montoTotal,
           proveedorDTO: { id: ordenFormik.proveedorDTO.id },
         } as any;
         await OrdenCompraService.updateOrdenCompra(ordenFormik.id, orden);
