@@ -78,9 +78,7 @@ const ArticuloTable = () => {
         Nuevo Artículo
       </Button>
       {isLoading ? (
-        <div>
-          <Loader />
-        </div>
+        <Loader />
       ) : (
         <Table striped bordered hover>
           <thead>
