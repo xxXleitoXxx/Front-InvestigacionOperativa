@@ -259,9 +259,8 @@ const ProveedorModal = ({
                           value={formik.values.codProv || ""}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          isInvalid={
-                            !!(formik.touched.codProv && formik.errors.codProv)
-                          }
+                          isInvalid={!!(formik.touched.codProv && formik.errors.codProv)}
+                          disabled={modalType !== ModalType.CREATE}
                         />
                         <Form.Control.Feedback type="invalid">
                           {formik.errors.codProv}

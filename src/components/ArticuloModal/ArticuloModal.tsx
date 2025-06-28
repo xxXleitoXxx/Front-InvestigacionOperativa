@@ -244,6 +244,7 @@ const ArticuloModal = ({
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   isInvalid={!!(formik.errors.codArt && formik.touched.codArt)}
+                  disabled={modalType !== ModalType.CREATE}
                 />
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.codArt}
