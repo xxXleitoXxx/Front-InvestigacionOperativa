@@ -171,7 +171,9 @@ const OrdenCompraModal = ({
   };
 
   const filteredArticulos = articulos.filter((articulo) =>
-    articulo.nomArt.toLowerCase().includes(articuloSearch.toLowerCase())
+    articulo.nomArt.toLowerCase().includes(articuloSearch.toLowerCase()) &&
+    // Excluir artículos dados de baja
+    (!articulo.fechaHoraBajaArt || articulo.fechaHoraBajaArt.trim() === "")
   );
 
   const filteredProveedores = proveedores.filter((proveedor) =>
@@ -231,7 +233,7 @@ const OrdenCompraModal = ({
               value={selectedArticulo?.id?.toString() ?? ""}
             >
               <option value="">Seleccione un artículo</option>
-              {articulos.map((articulo) => (
+              {filteredArticulos.map((articulo) => (
                 <option key={articulo.id} value={articulo.id}>
                   {articulo.nomArt}
                 </option>
