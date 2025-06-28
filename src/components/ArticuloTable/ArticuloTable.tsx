@@ -103,20 +103,31 @@ const ArticuloTable = () => {
   const [filtroFaltantes, setFiltroFaltantes] = useState(false);
   const [filtroAReponer, setFiltroAReponer] = useState(false);
   const [filtroDadoDeBaja, setFiltroDadoDeBaja] = useState(false);
+  const [filtroActivos, setFiltroActivos] = useState(false);
 
   // Filtrado local
   const articulosFiltrados = articulos.filter((art) => {
     let pasa = true;
-    if (filtroFaltantes && filtroAReponer) {
-      pasa = art.stock === 0 || art.stock < art.stockSeguridad;
-    } else if (filtroFaltantes) {
-      pasa = art.stock === 0;
-    } else if (filtroAReponer) {
-      pasa = art.stock < art.stockSeguridad;
+    
+    // Filtro de artículos activos (no dados de baja)
+    if (filtroActivos) {
+      pasa = pasa && (!art.fechaHoraBajaArt || art.fechaHoraBajaArt.trim() === "");
     }
+    
+    // Filtros de stock
+    if (filtroFaltantes && filtroAReponer) {
+      pasa = pasa && (art.stock === 0 || art.stock < art.stockSeguridad);
+    } else if (filtroFaltantes) {
+      pasa = pasa && art.stock === 0;
+    } else if (filtroAReponer) {
+      pasa = pasa && art.stock < art.stockSeguridad;
+    }
+    
+    // Filtro de artículos dados de baja
     if (filtroDadoDeBaja) {
       pasa = pasa && art.fechaHoraBajaArt != null;
     }
+    
     return pasa;
   });
 
@@ -136,6 +147,14 @@ const ArticuloTable = () => {
           Nuevo Artículo
         </Button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={filtroActivos}
+              onChange={() => setFiltroActivos((v) => !v)}
+            />
+            Artículos activos
+          </label>
           <label>
             <input
               type="checkbox"
