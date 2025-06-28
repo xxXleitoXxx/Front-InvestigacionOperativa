@@ -4,8 +4,10 @@ import Loader from "../Loader/Loader";
 import { Button, Table } from "react-bootstrap";
 import { ModalType } from "../../types/ModalType";
 import ProveedorModal from "../ProveedorModal/ProveedorModal";
+import ArticulosProveedorModal from "../ProveedorModal/ArticulosProveedorModal";
 import { EditButton } from "../EditButton/EditButton";
 import { DeleteButton } from "../DeleteButton/DeleteButton";
+import { ListButton } from "../ListButton/ListButton";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
 
 const ProveedorTable = () => {
@@ -31,6 +33,10 @@ const ProveedorTable = () => {
   const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
   const [title, setTitle] = useState("");
 
+  // Estado para el modal de artículos del proveedor
+  const [showArticulosModal, setShowArticulosModal] = useState(false);
+  const [selectedProveedor, setSelectedProveedor] = useState<ProveedorDTO | null>(null);
+
   // Lógica del Modal
   const handleClick = (
     newTitle: string,
@@ -41,6 +47,12 @@ const ProveedorTable = () => {
     setModalType(modal);
     setProveedor(prov);
     setShowModal(true);
+  };
+
+  // Función para mostrar artículos del proveedor
+  const handleShowArticulos = (proveedor: ProveedorDTO) => {
+    setSelectedProveedor(proveedor);
+    setShowArticulosModal(true);
   };
 
   // Variable que va a contener los datos recibido de la API
@@ -95,6 +107,7 @@ const ProveedorTable = () => {
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Fecha de Baja</th>
+              <th>Artículos</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -110,6 +123,11 @@ const ProveedorTable = () => {
                   {prove.fechaHoraBajaProv
                     ? new Date(prove.fechaHoraBajaProv).toLocaleString()
                     : "N/A"}
+                </td>
+                <td>
+                  <ListButton
+                    onClick={() => handleShowArticulos(prove)}
+                  />
                 </td>
                 <td>
                   <EditButton
@@ -138,6 +156,13 @@ const ProveedorTable = () => {
           prov={proveedor}
           title={title}
           refreshData={setRefreshData}
+        />
+      )}
+      {showArticulosModal && selectedProveedor && (
+        <ArticulosProveedorModal
+          show={showArticulosModal}
+          onHide={() => setShowArticulosModal(false)}
+          proveedor={selectedProveedor}
         />
       )}
     </div>
