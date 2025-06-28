@@ -133,5 +133,24 @@ export const ArticuloService = {
       console.error("Error en la solicitud:", error);
       throw error;
     }
+  },
+  getProductosFaltantes: async (): Promise<ArticuloDTO[]> => {
+    try {
+      const response = await fetch(`${BASE_URL}/Articulo/articulosFaltantes`);
+      return await handleResponse(response);
+    } catch (error) {
+      console.error("Error en la solicitud de productos faltantes:", error);
+      throw error;
+    }
+  },
+
+  getProductosAReponer: async (): Promise<ArticuloDTO[]> => {
+    try {
+      const response = await fetch(`${BASE_URL}/Articulo/productosAReponer`);
+      return await handleResponse(response);
+    } catch (error) {
+      console.error("Error en la solicitud de productos a reponer:", error);
+      throw error;
+    }
   }
 };

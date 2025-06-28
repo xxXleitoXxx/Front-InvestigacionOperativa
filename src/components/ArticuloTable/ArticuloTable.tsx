@@ -63,20 +63,181 @@ const ArticuloTable = () => {
     fetchArticulos();
   }, [refreshData]);
 
+  const [showFaltantes, setShowFaltantes] = useState(false);
+  const [showAReponer, setShowAReponer] = useState(false);
+  const [faltantes, setFaltantes] = useState<ArticuloDTO[]>([]);
+  const [aReponer, setAReponer] = useState<ArticuloDTO[]>([]);
+  const [loadingFaltantes, setLoadingFaltantes] = useState(false);
+  const [loadingAReponer, setLoadingAReponer] = useState(false);
+  const [errorFaltantes, setErrorFaltantes] = useState<string | null>(null);
+  const [errorAReponer, setErrorAReponer] = useState<string | null>(null);
+
+  const fetchFaltantes = async () => {
+    setLoadingFaltantes(true);
+    setErrorFaltantes(null);
+    try {
+      const data = await ArticuloService.getProductosFaltantes();
+      setFaltantes(data);
+    } catch (e) {
+      setErrorFaltantes('Error al cargar productos faltantes');
+    } finally {
+      setLoadingFaltantes(false);
+    }
+  };
+
+  const fetchAReponer = async () => {
+    setLoadingAReponer(true);
+    setErrorAReponer(null);
+    try {
+      const data = await ArticuloService.getProductosAReponer();
+      setAReponer(data);
+    } catch (e) {
+      setErrorAReponer('Error al cargar productos a reponer');
+    } finally {
+      setLoadingAReponer(false);
+    }
+  };
+
   return (
     <div>
       <h1>Tabla Artículos</h1>
-      <Button
-        onClick={() =>
-          handleClick(
-            "Añadir Artículo",
-            initializableNewArticulo(),
-            ModalType.CREATE
-          )
-        }
-      >
-        Nuevo Artículo
-      </Button>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+        <Button
+          onClick={() =>
+            handleClick(
+              "Añadir Artículo",
+              initializableNewArticulo(),
+              ModalType.CREATE
+            )
+          }
+        >
+          Nuevo Artículo
+        </Button>
+        <Button variant="warning" onClick={() => { setShowFaltantes((v) => !v); if (!showFaltantes) fetchFaltantes(); }}>
+          Listado de productos faltantes
+        </Button>
+        <Button variant="info" onClick={() => { setShowAReponer((v) => !v); if (!showAReponer) fetchAReponer(); }}>
+          Listado de productos a reponer
+        </Button>
+      </div>
+      {showFaltantes && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h4>Productos Faltantes</h4>
+          {loadingFaltantes ? <Loader /> : errorFaltantes ? <div>{errorFaltantes}</div> : (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Precio Venta</th>
+                  <th>Descripción</th>
+                  <th>Stock</th>
+                  <th>Stock Seguridad</th>
+                  <th>Demanda Diaria</th>
+                  <th>Desviación Estándar Uso</th>
+                  <th>Desviación Estándar Revisión</th>
+                  <th>Proveedor</th>
+                  <th>Fecha Baja</th>
+                  <th>Editar</th>
+                  <th>Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {faltantes.map((art) => (
+                  <tr key={art.id}>
+                    <td>{art.id}</td>
+                    <td>{art.codArt}</td>
+                    <td>{art.nomArt}</td>
+                    <td>{art.precioVenta}</td>
+                    <td>{art.descripcionArt}</td>
+                    <td>{art.stock}</td>
+                    <td>{art.stockSeguridad}</td>
+                    <td>{art.demandaDiaria}</td>
+                    <td>{art.desviacionEstandarUsoPeriodoEntrega}</td>
+                    <td>{art.desviacionEstandarDurantePeriodoRevisionEntrega}</td>
+                    <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
+                    <td>{art.fechaHoraBajaArt || "N/A"}</td>
+                    <td>
+                      <EditButton
+                        onClick={() =>
+                          handleClick("Editar artículo", art, ModalType.UPDATE)
+                        }
+                      />
+                    </td>
+                    <td>
+                      <DeleteButton
+                        onClick={() =>
+                          handleClick("Borrar Artículo", art, ModalType.DELETE)
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </div>
+      )}
+      {showAReponer && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h4>Productos a Reponer</h4>
+          {loadingAReponer ? <Loader /> : errorAReponer ? <div>{errorAReponer}</div> : (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Precio Venta</th>
+                  <th>Descripción</th>
+                  <th>Stock</th>
+                  <th>Stock Seguridad</th>
+                  <th>Demanda Diaria</th>
+                  <th>Desviación Estándar Uso</th>
+                  <th>Desviación Estándar Revisión</th>
+                  <th>Proveedor</th>
+                  <th>Fecha Baja</th>
+                  <th>Editar</th>
+                  <th>Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {aReponer.map((art) => (
+                  <tr key={art.id}>
+                    <td>{art.id}</td>
+                    <td>{art.codArt}</td>
+                    <td>{art.nomArt}</td>
+                    <td>{art.precioVenta}</td>
+                    <td>{art.descripcionArt}</td>
+                    <td>{art.stock}</td>
+                    <td>{art.stockSeguridad}</td>
+                    <td>{art.demandaDiaria}</td>
+                    <td>{art.desviacionEstandarUsoPeriodoEntrega}</td>
+                    <td>{art.desviacionEstandarDurantePeriodoRevisionEntrega}</td>
+                    <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
+                    <td>{art.fechaHoraBajaArt || "N/A"}</td>
+                    <td>
+                      <EditButton
+                        onClick={() =>
+                          handleClick("Editar artículo", art, ModalType.UPDATE)
+                        }
+                      />
+                    </td>
+                    <td>
+                      <DeleteButton
+                        onClick={() =>
+                          handleClick("Borrar Artículo", art, ModalType.DELETE)
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </div>
+      )}
       {isLoading ? (
         <Loader />
       ) : (
