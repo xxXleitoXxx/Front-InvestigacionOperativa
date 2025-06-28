@@ -63,40 +63,62 @@ const ArticuloTable = () => {
     fetchArticulos();
   }, [refreshData]);
 
-  const [showFaltantes, setShowFaltantes] = useState(false);
-  const [showAReponer, setShowAReponer] = useState(false);
-  const [faltantes, setFaltantes] = useState<ArticuloDTO[]>([]);
-  const [aReponer, setAReponer] = useState<ArticuloDTO[]>([]);
-  const [loadingFaltantes, setLoadingFaltantes] = useState(false);
-  const [loadingAReponer, setLoadingAReponer] = useState(false);
-  const [errorFaltantes, setErrorFaltantes] = useState<string | null>(null);
-  const [errorAReponer, setErrorAReponer] = useState<string | null>(null);
+  const [tablaModo, setTablaModo] = useState<'todos' | 'faltantes' | 'areponer'>('todos');
+  const [isLoadingFiltro, setIsLoadingFiltro] = useState(false);
+  const [errorFiltro, setErrorFiltro] = useState<string | null>(null);
 
-  const fetchFaltantes = async () => {
-    setLoadingFaltantes(true);
-    setErrorFaltantes(null);
+  const handleMostrarTodos = () => {
+    setTablaModo('todos');
+    setErrorFiltro(null);
+  };
+
+  const handleMostrarFaltantes = async () => {
+    setIsLoadingFiltro(true);
+    setErrorFiltro(null);
     try {
       const data = await ArticuloService.getProductosFaltantes();
-      setFaltantes(data);
+      setArticulos(data);
+      setTablaModo('faltantes');
     } catch (e) {
-      setErrorFaltantes('Error al cargar productos faltantes');
+      setErrorFiltro('Error al cargar artículos faltantes');
     } finally {
-      setLoadingFaltantes(false);
+      setIsLoadingFiltro(false);
     }
   };
 
-  const fetchAReponer = async () => {
-    setLoadingAReponer(true);
-    setErrorAReponer(null);
+  const handleMostrarAReponer = async () => {
+    setIsLoadingFiltro(true);
+    setErrorFiltro(null);
     try {
       const data = await ArticuloService.getProductosAReponer();
-      setAReponer(data);
+      setArticulos(data);
+      setTablaModo('areponer');
     } catch (e) {
-      setErrorAReponer('Error al cargar productos a reponer');
+      setErrorFiltro('Error al cargar artículos a reponer');
     } finally {
-      setLoadingAReponer(false);
+      setIsLoadingFiltro(false);
     }
   };
+
+  const [filtroFaltantes, setFiltroFaltantes] = useState(false);
+  const [filtroAReponer, setFiltroAReponer] = useState(false);
+  const [filtroDadoDeBaja, setFiltroDadoDeBaja] = useState(false);
+
+  // Filtrado local
+  const articulosFiltrados = articulos.filter((art) => {
+    let pasa = true;
+    if (filtroFaltantes && filtroAReponer) {
+      pasa = art.stock === 0 || art.stock < art.stockSeguridad;
+    } else if (filtroFaltantes) {
+      pasa = art.stock === 0;
+    } else if (filtroAReponer) {
+      pasa = art.stock < art.stockSeguridad;
+    }
+    if (filtroDadoDeBaja) {
+      pasa = pasa && art.fechaHoraBajaArt != null;
+    }
+    return pasa;
+  });
 
   return (
     <div>
@@ -113,131 +135,33 @@ const ArticuloTable = () => {
         >
           Nuevo Artículo
         </Button>
-        <Button variant="warning" onClick={() => { setShowFaltantes((v) => !v); if (!showFaltantes) fetchFaltantes(); }}>
-          Listado de productos faltantes
-        </Button>
-        <Button variant="info" onClick={() => { setShowAReponer((v) => !v); if (!showAReponer) fetchAReponer(); }}>
-          Listado de productos a reponer
-        </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={filtroFaltantes}
+              onChange={() => setFiltroFaltantes((v) => !v)}
+            />
+            Artículos faltantes
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={filtroAReponer}
+              onChange={() => setFiltroAReponer((v) => !v)}
+            />
+            Artículos a reponer
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={filtroDadoDeBaja}
+              onChange={() => setFiltroDadoDeBaja((v) => !v)}
+            />
+            Artículos dados de baja
+          </label>
+        </div>
       </div>
-      {showFaltantes && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4>Productos Faltantes</h4>
-          {loadingFaltantes ? <Loader /> : errorFaltantes ? <div>{errorFaltantes}</div> : (
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Id</th>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Precio Venta</th>
-                  <th>Descripción</th>
-                  <th>Stock</th>
-                  <th>Stock Seguridad</th>
-                  <th>Demanda Diaria</th>
-                  <th>Desviación Estándar Uso</th>
-                  <th>Desviación Estándar Revisión</th>
-                  <th>Proveedor</th>
-                  <th>Fecha Baja</th>
-                  <th>Editar</th>
-                  <th>Eliminar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {faltantes.map((art) => (
-                  <tr key={art.id}>
-                    <td>{art.id}</td>
-                    <td>{art.codArt}</td>
-                    <td>{art.nomArt}</td>
-                    <td>{art.precioVenta}</td>
-                    <td>{art.descripcionArt}</td>
-                    <td>{art.stock}</td>
-                    <td>{art.stockSeguridad}</td>
-                    <td>{art.demandaDiaria}</td>
-                    <td>{art.desviacionEstandarUsoPeriodoEntrega}</td>
-                    <td>{art.desviacionEstandarDurantePeriodoRevisionEntrega}</td>
-                    <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
-                    <td>{art.fechaHoraBajaArt || "N/A"}</td>
-                    <td>
-                      <EditButton
-                        onClick={() =>
-                          handleClick("Editar artículo", art, ModalType.UPDATE)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <DeleteButton
-                        onClick={() =>
-                          handleClick("Borrar Artículo", art, ModalType.DELETE)
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          )}
-        </div>
-      )}
-      {showAReponer && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4>Productos a Reponer</h4>
-          {loadingAReponer ? <Loader /> : errorAReponer ? <div>{errorAReponer}</div> : (
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Id</th>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Precio Venta</th>
-                  <th>Descripción</th>
-                  <th>Stock</th>
-                  <th>Stock Seguridad</th>
-                  <th>Demanda Diaria</th>
-                  <th>Desviación Estándar Uso</th>
-                  <th>Desviación Estándar Revisión</th>
-                  <th>Proveedor</th>
-                  <th>Fecha Baja</th>
-                  <th>Editar</th>
-                  <th>Eliminar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {aReponer.map((art) => (
-                  <tr key={art.id}>
-                    <td>{art.id}</td>
-                    <td>{art.codArt}</td>
-                    <td>{art.nomArt}</td>
-                    <td>{art.precioVenta}</td>
-                    <td>{art.descripcionArt}</td>
-                    <td>{art.stock}</td>
-                    <td>{art.stockSeguridad}</td>
-                    <td>{art.demandaDiaria}</td>
-                    <td>{art.desviacionEstandarUsoPeriodoEntrega}</td>
-                    <td>{art.desviacionEstandarDurantePeriodoRevisionEntrega}</td>
-                    <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
-                    <td>{art.fechaHoraBajaArt || "N/A"}</td>
-                    <td>
-                      <EditButton
-                        onClick={() =>
-                          handleClick("Editar artículo", art, ModalType.UPDATE)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <DeleteButton
-                        onClick={() =>
-                          handleClick("Borrar Artículo", art, ModalType.DELETE)
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          )}
-        </div>
-      )}
       {isLoading ? (
         <Loader />
       ) : (
@@ -261,7 +185,7 @@ const ArticuloTable = () => {
             </tr>
           </thead>
           <tbody>
-            {articulos.map((art) => (
+            {articulosFiltrados.map((art) => (
               <tr key={art.id}>
                 <td>{art.id}</td>
                 <td>{art.codArt}</td>
