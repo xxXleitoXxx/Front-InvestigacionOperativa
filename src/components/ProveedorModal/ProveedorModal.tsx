@@ -30,7 +30,13 @@ const ProveedorModal = ({
 }: ProveedorModalProps) => {
   const [proveedorArticulos, setProveedorArticulos] = useState<
     ProveedorArticuloDTO[]
-  >(prov.proveedorArticulos || []);
+  >(() => {
+    // Asegurar que todos los artículos tengan TipoLote válido
+    return (prov.proveedorArticulos || []).map(art => ({
+      ...art,
+      TipoLote: art.TipoLote || TipoLote.LOTEFIJO
+    }));
+  });
   
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [isLoadingArticulos, setIsLoadingArticulos] = useState(false);
@@ -114,26 +120,41 @@ const ProveedorModal = ({
 
   const handleSaveUpdate = async (proveedor: ProveedorDTO) => {
     try {
+      // Debug: verificar valores de TipoLote antes del mapeo
+      console.log("[DEBUG] Valores de TipoLote antes del mapeo:", proveedorArticulos.map(art => ({ id: art.articuloDTO.id, TipoLote: art.TipoLote })));
+      
       // Mapeo la estructura de proveedorArticulos
-      const proveedorArticulosMapped = proveedorArticulos.map((art) => ({
-        id: typeof art.id === 'number' ? art.id : 0,
-        fechaHoraBajaArtProv: "",
-        costoGeneralInventario: art.costoGeneralInventario,
-        demoraEntrega: art.demoraEntrega,
-        nivelDeServicio: art.nivelDeServicio,
-        costoUnitario: art.costoUnitario,
-        costoPedido: art.costoPedido,
-        costoMantenimiento: art.costoMantenimiento,
-        loteOptimo: art.loteOptimo,
-        puntoPedido: art.puntoPedido,
-        cantidadAPedir: art.cantidadAPedir,
-        inventarioMaximo: art.inventarioMaximo,
-        periodoRevision: art.periodoRevision,
-        tipoLote: art.TipoLote, // Solo esta propiedad
-        articuloDTO: {
-          id: art.articuloDTO.id
-        }
-      }));
+      const proveedorArticulosMapped = proveedorArticulos.map((art) => {
+        // Asegurar que TipoLote tenga un valor válido
+        const tipoLoteValue = art.TipoLote && art.TipoLote !== null && art.TipoLote !== undefined 
+          ? art.TipoLote 
+          : TipoLote.LOTEFIJO;
+        
+        console.log(`[DEBUG] Artículo ${art.articuloDTO.id}: TipoLote original = ${art.TipoLote}, TipoLote final = ${tipoLoteValue}`);
+        
+        return {
+          id: typeof art.id === 'number' ? art.id : 0,
+          fechaHoraBajaArtProv: "",
+          costoGeneralInventario: art.costoGeneralInventario,
+          demoraEntrega: art.demoraEntrega,
+          nivelDeServicio: art.nivelDeServicio,
+          costoUnitario: art.costoUnitario,
+          costoPedido: art.costoPedido,
+          costoMantenimiento: art.costoMantenimiento,
+          loteOptimo: art.loteOptimo,
+          puntoPedido: art.puntoPedido,
+          cantidadAPedir: art.cantidadAPedir,
+          inventarioMaximo: art.inventarioMaximo,
+          periodoRevision: art.periodoRevision,
+          tipoLote: tipoLoteValue,
+          articuloDTO: {
+            id: art.articuloDTO.id
+          }
+        };
+      });
+
+      // Debug: verificar valores después del mapeo
+      console.log("[DEBUG] Valores de TipoLote después del mapeo:", proveedorArticulosMapped.map(art => ({ id: art.articuloDTO.id, TipoLote: art.TipoLote })));
 
       // Estructura final para enviar
       const datosAEnviar = {
@@ -146,6 +167,13 @@ const ProveedorModal = ({
       };
 
       console.log("[DEBUG] Datos enviados a ProveedorService:", JSON.stringify(datosAEnviar, null, 2));
+      
+      // Log específico para TipoLote en cada artículo
+      console.log("[DEBUG] Verificación específica de TipoLote en cada artículo:");
+      datosAEnviar.proveedorArticulos.forEach((art, index) => {
+        console.log(`Artículo ${index + 1} (ID: ${art.articuloDTO.id}): TipoLote = "${art.TipoLote}" (tipo: ${typeof art.TipoLote})`);
+      });
+
       const isNew = proveedor.id === 0;
       if (isNew) {
         await ProveedorService.createProveedor(datosAEnviar as any);
