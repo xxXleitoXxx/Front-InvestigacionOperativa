@@ -15,6 +15,6 @@ export interface ProveedorArticuloDTO {
     cantidadAPedir: number;
     inventarioMaximo: number;
     periodoRevision: number;//se carga
-    TipoLote: TipoLote; // Se carga
+    tipoLote: TipoLote; // Se carga - cambiado a minúscula para coincidir con el backend
     articuloDTO: ArticuloOCDTO;
 }

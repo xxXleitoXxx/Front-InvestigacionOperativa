@@ -31,11 +31,17 @@ const ProveedorModal = ({
   const [proveedorArticulos, setProveedorArticulos] = useState<
     ProveedorArticuloDTO[]
   >(() => {
-    // Asegurar que todos los artículos tengan TipoLote válido
-    return (prov.proveedorArticulos || []).map(art => ({
+    // Asegurar que todos los artículos tengan tipoLote válido
+    const articulosInicializados = (prov.proveedorArticulos || []).map(art => ({
       ...art,
-      TipoLote: art.TipoLote || TipoLote.LOTEFIJO
+      tipoLote: art.tipoLote || TipoLote.LOTEFIJO
     }));
+    
+    console.log("[DEBUG] Inicialización de proveedorArticulos:");
+    console.log("Artículos originales:", prov.proveedorArticulos);
+    console.log("Artículos inicializados:", articulosInicializados);
+    
+    return articulosInicializados;
   });
   
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
@@ -76,7 +82,7 @@ const ProveedorModal = ({
       cantidadAPedir: 0,
       inventarioMaximo: 0,
       periodoRevision: 0,
-      TipoLote: TipoLote.LOTEFIJO,
+      tipoLote: TipoLote.LOTEFIJO,
       articuloDTO: {
         id: 0,
         codArt: "",
@@ -120,17 +126,17 @@ const ProveedorModal = ({
 
   const handleSaveUpdate = async (proveedor: ProveedorDTO) => {
     try {
-      // Debug: verificar valores de TipoLote antes del mapeo
-      console.log("[DEBUG] Valores de TipoLote antes del mapeo:", proveedorArticulos.map(art => ({ id: art.articuloDTO.id, TipoLote: art.TipoLote })));
+      // Debug: verificar valores de tipoLote antes del mapeo
+      console.log("[DEBUG] Valores de tipoLote antes del mapeo:", proveedorArticulos.map(art => ({ id: art.articuloDTO.id, tipoLote: art.tipoLote })));
       
       // Mapeo la estructura de proveedorArticulos
       const proveedorArticulosMapped = proveedorArticulos.map((art) => {
-        // Asegurar que TipoLote tenga un valor válido
-        const tipoLoteValue = art.TipoLote && art.TipoLote !== null && art.TipoLote !== undefined 
-          ? art.TipoLote 
+        // Asegurar que tipoLote tenga un valor válido
+        const tipoLoteValue = art.tipoLote && art.tipoLote !== null && art.tipoLote !== undefined 
+          ? art.tipoLote 
           : TipoLote.LOTEFIJO;
         
-        console.log(`[DEBUG] Artículo ${art.articuloDTO.id}: TipoLote original = ${art.TipoLote}, TipoLote final = ${tipoLoteValue}`);
+        console.log(`[DEBUG] Artículo ${art.articuloDTO.id}: tipoLote original = ${art.tipoLote}, tipoLote final = ${tipoLoteValue}`);
         
         return {
           id: typeof art.id === 'number' ? art.id : 0,
@@ -154,7 +160,7 @@ const ProveedorModal = ({
       });
 
       // Debug: verificar valores después del mapeo
-      console.log("[DEBUG] Valores de TipoLote después del mapeo:", proveedorArticulosMapped.map(art => ({ id: art.articuloDTO.id, TipoLote: art.TipoLote })));
+      console.log("[DEBUG] Valores de tipoLote después del mapeo:", proveedorArticulosMapped.map(art => ({ id: art.articuloDTO.id, tipoLote: art.tipoLote })));
 
       // Estructura final para enviar
       const datosAEnviar = {
@@ -168,10 +174,10 @@ const ProveedorModal = ({
 
       console.log("[DEBUG] Datos enviados a ProveedorService:", JSON.stringify(datosAEnviar, null, 2));
       
-      // Log específico para TipoLote en cada artículo
-      console.log("[DEBUG] Verificación específica de TipoLote en cada artículo:");
+      // Log específico para tipoLote en cada artículo
+      console.log("[DEBUG] Verificación específica de tipoLote en cada artículo:");
       datosAEnviar.proveedorArticulos.forEach((art, index) => {
-        console.log(`Artículo ${index + 1} (ID: ${art.articuloDTO.id}): TipoLote = "${art.TipoLote}" (tipo: ${typeof art.TipoLote})`);
+        console.log(`Artículo ${index + 1} (ID: ${art.articuloDTO.id}): tipoLote = "${art.tipoLote}" (tipo: ${typeof art.tipoLote})`);
       });
 
       const isNew = proveedor.id === 0;
@@ -534,8 +540,8 @@ const ProveedorModal = ({
                               <Form.Group className="mb-3">
                                 <Form.Label>Tipo de Lote</Form.Label>
                                 <Form.Select
-                                  value={articulo.TipoLote}
-                                  onChange={(e) => updateProveedorArticulo(index, 'TipoLote', e.target.value as TipoLote)}
+                                  value={articulo.tipoLote || TipoLote.LOTEFIJO}
+                                  onChange={(e) => updateProveedorArticulo(index, 'tipoLote', e.target.value as TipoLote)}
                                 >
                                   <option value={TipoLote.LOTEFIJO}>Lote Fijo</option>
                                   <option value={TipoLote.PERIODOFIJO}>Período Fijo</option>
