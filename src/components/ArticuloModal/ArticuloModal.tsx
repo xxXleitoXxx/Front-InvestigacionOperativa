@@ -133,12 +133,6 @@ const ArticuloModal = ({
 
   /////---------------------------Logica y Metodos--------------------------------////
 
-  //buscar Proveedores en formulario
-  const filteredProveedores = proveedores.filter((proveedor) =>
-    proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
-  );
-  /////---------------------------Logica y Metodos ---------------------------------////
-
   /////---------------------------Formulario--------------------------------////
   //esquema de validacion de formulario
 
@@ -177,7 +171,6 @@ const ArticuloModal = ({
         art.desviacionEstandarUsoPeriodoEntrega || 1,
       desviacionEstandarDurantePeriodoRevisionEntrega:
         art.desviacionEstandarDurantePeriodoRevisionEntrega || 1,
-      proveedorDTO: art.proveedorDTO || null,
     },
     validationSchema: validationSchema,
     validateOnChange: true,
@@ -396,52 +389,55 @@ const ArticuloModal = ({
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group controlId="formProveedorSearch">
-                <Form.Label>Buscar Proveedor</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar proveedor..."
-                  value={proveedorSearch}
-                  onChange={(e) => setProveedorSearch(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formProveedorElegido">
-                <Form.Label>Proveedor</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={selectedProveedorCod}
-                  onChange={(e) => {
-                    const proveedorCod = e.target.value;
-                    setSelectedProveedorCod(proveedorCod);
-                    const selectedProveedor = proveedores.find(
-                      (prov) => prov.codProv === proveedorCod
-                    );
-                    formik.setFieldValue(
-                      "proveedorDTO",
-                      selectedProveedor || null
-                    );
-                  }}
-                  isInvalid={
-                    !!(
-                      formik.errors.proveedorDTO && formik.touched.proveedorDTO
-                    )
-                  }
-                >
-                  <option value="">Seleccione un proveedor</option>
-                  {filteredProveedores.map((proveedor, index) => (
-                    <option
-                      key={`proveedor-${index}`}
-                      value={proveedor.codProv}
+              {modalType !== ModalType.CREATE && (
+                <>
+                  <Form.Group controlId="formProveedorSearch">
+                    <Form.Label>Buscar Proveedor</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Buscar proveedor..."
+                      value={proveedorSearch}
+                      onChange={(e) => setProveedorSearch(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formProveedorElegido">
+                    <Form.Label>Proveedor</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={selectedProveedorCod}
+                      onChange={(e) => {
+                        const proveedorCod = e.target.value;
+                        setSelectedProveedorCod(proveedorCod);
+                        const selectedProveedor = proveedores.find(
+                          (prov) => prov.codProv === proveedorCod
+                        );
+                        formik.setFieldValue(
+                          "proveedorDTO",
+                          selectedProveedor || null
+                        );
+                      }}
+                      isInvalid={
+                        !!(
+                          formik.errors.proveedorDTO && formik.touched.proveedorDTO
+                        )
+                      }
                     >
-                      {proveedor.nomProv}
-                    </option>
-                  ))}
-                </Form.Control>
-                {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
-                  <div style={{ color: "red" }}>Error en el proveedor</div>
-                )}
-              </Form.Group>
+                      <option value="">Seleccione un proveedor</option>
+                      {proveedores.map((proveedor, index) => (
+                        <option
+                          key={`proveedor-${index}`}
+                          value={proveedor.codProv}
+                        >
+                          {proveedor.nomProv}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
+                      <div style={{ color: "red" }}>Error en el proveedor</div>
+                    )}
+                  </Form.Group>
+                </>
+              )}
 
               <Modal.Footer>
                 <Button variant="secondary" onClick={onHide}>
