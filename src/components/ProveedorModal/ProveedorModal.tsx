@@ -129,8 +129,7 @@ const ProveedorModal = ({
         cantidadAPedir: art.cantidadAPedir,
         inventarioMaximo: art.inventarioMaximo,
         periodoRevision: art.periodoRevision,
-        tipoLote: art.TipoLote, // Ojo: el enum ya es string
-        TipoLote: art.TipoLote, // Para cumplir con el tipo, aunque el backend solo use tipoLote
+        tipoLote: art.TipoLote, // Solo esta propiedad
         articuloDTO: {
           id: art.articuloDTO.id
         }
