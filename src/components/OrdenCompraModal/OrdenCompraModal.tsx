@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import type { ModalType } from "../../types/ModalType";
 import type { OrdenCompraDTO } from "../../types/OrdenCompraDTO";
-import type { ArticuloOCDTO } from "../../types/ArticuloOCDTO";
+import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import { OrdenCompraService } from "../../services/OrdenCompraService";
 import { ProveedorService } from "../../services/ProveedorService";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
@@ -34,11 +34,11 @@ const OrdenCompraModal = ({
   handleOrdenEnProceso,
   handleOrdenFinalizada,
 }: OrdenCompraModalProps) => {
-  const [articulos, setArticulos] = useState<ArticuloOCDTO[]>([]);
+  const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [articuloSearch, setArticuloSearch] = useState("");
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
-  const [selectedArticulo, setSelectedArticulo] = useState<ArticuloOCDTO | null>(null);
+  const [selectedArticulo, setSelectedArticulo] = useState<ArticuloDTO | null>(null);
   const [selectedProveedor, setSelectedProveedor] = useState<ProveedorDTO | null>(null);
 
   useEffect(() => {
@@ -180,7 +180,7 @@ const OrdenCompraModal = ({
     )
   );
 
-  const addArticuloToProveedor = (articulo: ArticuloOCDTO) => {
+  const addArticuloToProveedor = (articulo: ArticuloDTO) => {
     setSelectedArticulo(articulo);
   };
 
@@ -280,7 +280,7 @@ const OrdenCompraModal = ({
                             <option value="">Seleccione un proveedor</option>
                             {filteredProveedores.map((proveedor) => (
                               <option key={proveedor.id} value={proveedor.id}>
-                                {proveedor.nomProv}
+                                {proveedor.nomProv} {selectedArticulo?.proveedorDTO?.id === proveedor.id ? '🔵' : ''}
                               </option>
                             ))}
                           </Form.Control>
