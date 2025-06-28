@@ -394,11 +394,23 @@ const ProveedorModal = ({
                                   disabled={isLoadingArticulos}
                                 >
                                   <option value="">Seleccione un artículo...</option>
-                                  {articulos.map((art) => (
-                                    <option key={art.id} value={art.id}>
-                                      {art.codArt} - {art.nomArt}
-                                    </option>
-                                  ))}
+                                  {articulos
+                                    .filter(art => {
+                                      // Filtrar artículos que ya están seleccionados en otros índices
+                                      const isSelectedInOtherIndex = proveedorArticulos.some((proveedorArt, otherIndex) => 
+                                        otherIndex !== index && proveedorArt.articuloDTO.id === art.id
+                                      );
+                                      
+                                      // Filtrar artículos que están dados de baja
+                                      const isArticuloDadoDeBaja = art.fechaHoraBajaArt && art.fechaHoraBajaArt.trim() !== "";
+                                      
+                                      return !isSelectedInOtherIndex && !isArticuloDadoDeBaja;
+                                    })
+                                    .map((art) => (
+                                      <option key={art.id} value={art.id}>
+                                        {art.codArt} - {art.nomArt}
+                                      </option>
+                                    ))}
                                 </Form.Select>
                               </Form.Group>
                             </Col>
