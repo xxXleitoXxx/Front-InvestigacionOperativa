@@ -16,6 +16,7 @@ type ArticuloModalProps = {
   modalType: ModalType;
   art: ArticuloDTO;
   refreshData: React.Dispatch<React.SetStateAction<boolean>>;
+  proveedorPredeterminado?: string;
 };
 
 const ArticuloModal = ({
@@ -25,6 +26,7 @@ const ArticuloModal = ({
   modalType,
   art,
   refreshData,
+  proveedorPredeterminado,
 }: ArticuloModalProps) => {
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
@@ -49,14 +51,15 @@ const ArticuloModal = ({
     fetchProveedores();
   }, []);
 
-  // Initialize selectedProveedorCod when art changes
+  // Sincroniza el proveedor seleccionado SOLO cuando el modal se abre y los proveedores están cargados
   useEffect(() => {
-    if (art.proveedorDTO?.codProv) {
-      setSelectedProveedorCod(art.proveedorDTO.codProv);
-    } else {
+    if (show && proveedorPredeterminado) {
+      setSelectedProveedorCod(proveedorPredeterminado);
+    } else if (show) {
       setSelectedProveedorCod("");
     }
-  }, [art]);
+  }, [show, proveedorPredeterminado]);
+
   //POST y PUT ArticulosDTO
   const handleSaveUpdate = async (arti: ArticuloDTO) => {
     try {
@@ -360,15 +363,17 @@ const ArticuloModal = ({
                     />
                   </Form.Group>
                   <Form.Group controlId="formProveedorElegido">
-                    <Form.Label>Proveedor</Form.Label>
+                    <Form.Label>Proveedor Predeterminado</Form.Label>
                     <Form.Control
                       as="select"
                       value={selectedProveedorCod}
                       onChange={(e) => {
-                        const proveedorCod = e.target.value;
-                        setSelectedProveedorCod(proveedorCod);
+                        const proveedorNombre = e.target.value;
+                        setSelectedProveedorCod(proveedorNombre);
+                        
+                        // Si se selecciona un proveedor específico
                         const selectedProveedor = proveedores.find(
-                          (prov) => prov.codProv === proveedorCod
+                          (prov) => prov.nomProv === proveedorNombre
                         );
                         formik.setFieldValue(
                           "proveedorDTO",
@@ -382,14 +387,18 @@ const ArticuloModal = ({
                       }
                     >
                       <option value="">Seleccione un proveedor</option>
-                      {proveedores.map((proveedor, index) => (
-                        <option
-                          key={`proveedor-${index}`}
-                          value={proveedor.codProv}
-                        >
-                          {proveedor.nomProv}
-                        </option>
-                      ))}
+                      {proveedores
+                        .filter((proveedor) =>
+                          proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
+                        )
+                        .map((proveedor, index) => (
+                          <option
+                            key={`proveedor-${index}`}
+                            value={proveedor.nomProv}
+                          >
+                            {proveedor.nomProv}
+                          </option>
+                        ))}
                     </Form.Control>
                     {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
                       <div style={{ color: "red" }}>Error en el proveedor</div>

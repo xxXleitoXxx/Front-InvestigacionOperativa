@@ -271,6 +271,7 @@ const ArticuloTable = () => {
           art={articulo}
           title={title}
           refreshData={setRefreshData}
+          proveedorPredeterminado={articulo.proveedorDTO?.nomProv}
         />
       )}
       {showProveedoresModal && selectedArticulo !== null && (
