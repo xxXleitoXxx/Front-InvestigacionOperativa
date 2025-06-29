@@ -22,8 +22,7 @@ const ArticuloTable = () => {
       stock: 0,
       stockSeguridad: 0,
       demandaDiaria: 1, // Inicializado a 1 si debe ser mayor que cero
-      desviacionEstandarUsoPeriodoEntrega: 1, // Inicializado a 1 si debe ser mayor que cero
-      desviacionEstandarDurantePeriodoRevisionEntrega: 1, // Inicializado a 1 si debe ser mayor que cero
+      desviacionEstandar: 1, // Inicializado a 1 si debe ser mayor que cero
       proveedorDTO: null, // Inicializado como null si es opcional
     };
   };
@@ -195,8 +194,7 @@ const ArticuloTable = () => {
               <th>Stock</th>
               <th>Stock Seguridad</th>
               <th>Demanda Diaria</th>
-              <th>Desviación Estándar Uso</th>
-              <th>Desviación Estándar Revisión</th>
+              <th>Desviación Estándar</th>
               <th>Proveedor</th>
               <th>Fecha Baja</th>
               <th>Editar</th>
@@ -214,8 +212,7 @@ const ArticuloTable = () => {
                 <td>{art.stock}</td>
                 <td>{art.stockSeguridad}</td>
                 <td>{art.demandaDiaria}</td>
-                <td>{art.desviacionEstandarUsoPeriodoEntrega}</td>
-                <td>{art.desviacionEstandarDurantePeriodoRevisionEntrega}</td>
+                <td>{art.desviacionEstandar}</td>
                 <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
                 <td>{art.fechaHoraBajaArt || "N/A"}</td>
                 <td>

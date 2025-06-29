@@ -11,7 +11,6 @@ export interface ArticuloDTO {
     stock: number;
     stockSeguridad: number;
     demandaDiaria: number;
-    desviacionEstandarUsoPeriodoEntrega: number;
-    desviacionEstandarDurantePeriodoRevisionEntrega: number;
+    desviacionEstandar: number;
     proveedorDTO?: ProveedorDTO|null;
 }

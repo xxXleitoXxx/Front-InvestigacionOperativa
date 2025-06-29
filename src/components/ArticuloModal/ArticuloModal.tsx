@@ -150,16 +150,9 @@ const ArticuloModal = ({
     demandaDiaria: Yup.number()
       .positive("La demanda diaria debe ser mayor a cero")
       .required("La demanda diaria es requerida"),
-    desviacionEstandarUsoPeriodoEntrega: Yup.number()
-      .positive("La desviación estándar en el uso debe ser mayor a cero")
-      .required("La desviación estándar en el uso es requerida"),
-    desviacionEstandarDurantePeriodoRevisionEntrega: Yup.number()
-      .positive(
-        "La desviación estándar durante el período de revisión debe ser mayor a cero"
-      )
-      .required(
-        "La desviación estándar durante el período de revisión es requerida"
-      ),
+    desviacionEstandar: Yup.number()
+      .positive("La desviación estándar debe ser mayor a cero")
+      .required("La desviación estándar es requerida"),
   });
 
   //formik InicialValues
@@ -167,10 +160,7 @@ const ArticuloModal = ({
     initialValues: {
       ...art,
       demandaDiaria: art.demandaDiaria || 1,
-      desviacionEstandarUsoPeriodoEntrega:
-        art.desviacionEstandarUsoPeriodoEntrega || 1,
-      desviacionEstandarDurantePeriodoRevisionEntrega:
-        art.desviacionEstandarDurantePeriodoRevisionEntrega || 1,
+      desviacionEstandar: art.desviacionEstandar || 1,
     },
     validationSchema: validationSchema,
     validateOnChange: true,
@@ -338,55 +328,23 @@ const ArticuloModal = ({
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group controlId="formDesviacionEstandarUsoPeriodoEntrega">
-                <Form.Label>Desviación Estándar Uso Periodo Entrega</Form.Label>
+              <Form.Group controlId="formDesviacionEstandar">
+                <Form.Label>Desviación Estándar</Form.Label>
                 <Form.Control
-                  name="desviacionEstandarUsoPeriodoEntrega"
+                  name="desviacionEstandar"
                   type="number"
-                  value={
-                    formik.values.desviacionEstandarUsoPeriodoEntrega || ""
-                  }
+                  value={formik.values.desviacionEstandar || ""}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   isInvalid={
                     !!(
-                      formik.errors.desviacionEstandarUsoPeriodoEntrega &&
-                      formik.touched.desviacionEstandarUsoPeriodoEntrega
+                      formik.errors.desviacionEstandar &&
+                      formik.touched.desviacionEstandar
                     )
                   }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {formik.errors.desviacionEstandarUsoPeriodoEntrega}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group controlId="formDesviacionEstandarDurantePeriodoRevisionEntrega">
-                <Form.Label>
-                  Desviación Estándar Durante Periodo Revisión Entrega
-                </Form.Label>
-                <Form.Control
-                  name="desviacionEstandarDurantePeriodoRevisionEntrega"
-                  type="number"
-                  value={
-                    formik.values
-                      .desviacionEstandarDurantePeriodoRevisionEntrega || ""
-                  }
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={
-                    !!(
-                      formik.errors
-                        .desviacionEstandarDurantePeriodoRevisionEntrega &&
-                      formik.touched
-                        .desviacionEstandarDurantePeriodoRevisionEntrega
-                    )
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {
-                    formik.errors
-                      .desviacionEstandarDurantePeriodoRevisionEntrega
-                  }
+                  {formik.errors.desviacionEstandar}
                 </Form.Control.Feedback>
               </Form.Group>
 

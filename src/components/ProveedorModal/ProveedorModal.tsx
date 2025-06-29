@@ -76,7 +76,7 @@ const ProveedorModal = ({
       fechaHoraBajaArtProv: "",
       costoGeneralInventario: 0,
       demoraEntrega: 0,
-      nivelDeServicio: 95, // Valor por defecto
+      nivelDeServicio: 0,
       costoUnitario: 0,
       costoPedido: 0,
       costoMantenimiento: 0,
@@ -96,8 +96,7 @@ const ProveedorModal = ({
         stock: 0,
         stockSeguridad: 0,
         demandaDiaria: 0,
-        desviacionEstandarUsoPeriodoEntrega: 0,
-        desviacionEstandarDurantePeriodoRevisionEntrega: 0,
+        desviacionEstandar: 0,
         proveedorDTO: null,
       },
     };
