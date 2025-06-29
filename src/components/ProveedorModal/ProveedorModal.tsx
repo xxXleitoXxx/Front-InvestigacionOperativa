@@ -44,6 +44,9 @@ const ProveedorModal = ({
     return articulosInicializados;
   });
   
+  // Estado para rastrear artículos modificados temporalmente
+  const [articulosModificadosTemporalmente, setArticulosModificadosTemporalmente] = useState<Set<number>>(new Set());
+
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [isLoadingArticulos, setIsLoadingArticulos] = useState(false);
 
@@ -101,12 +104,49 @@ const ProveedorModal = ({
   };
 
   const addProveedorArticulo = () => {
+    const newIndex = proveedorArticulos.length;
     setProveedorArticulos([...proveedorArticulos, createNewProveedorArticulo()]);
+    // Marcar el nuevo artículo como modificado temporalmente
+    setArticulosModificadosTemporalmente(prev => new Set(prev).add(newIndex));
   };
 
   const removeProveedorArticulo = (index: number) => {
     const newArticulos = proveedorArticulos.filter((_, i) => i !== index);
     setProveedorArticulos(newArticulos);
+  };
+
+  const darDeBajaArticuloProveedor = (index: number) => {
+    const newArticulos = [...proveedorArticulos];
+    const fechaActual = new Date();
+    const fechaFormateada = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
+    newArticulos[index] = { 
+      ...newArticulos[index], 
+      fechaHoraBajaArtProv: fechaFormateada 
+    };
+    setProveedorArticulos(newArticulos);
+    
+    // Marcar como modificado temporalmente
+    setArticulosModificadosTemporalmente(prev => new Set(prev).add(index));
+    
+    toast.success("Artículo marcado para dar de baja", {
+      position: "top-center",
+    });
+  };
+
+  const darDeAltaArticuloProveedor = (index: number) => {
+    const newArticulos = [...proveedorArticulos];
+    newArticulos[index] = { 
+      ...newArticulos[index], 
+      fechaHoraBajaArtProv: "" 
+    };
+    setProveedorArticulos(newArticulos);
+    
+    // Mantener como modificado temporalmente
+    setArticulosModificadosTemporalmente(prev => new Set(prev).add(index));
+    
+    toast.success("Artículo marcado para dar de alta", {
+      position: "top-center",
+    });
   };
 
   const updateProveedorArticulo = (index: number, field: keyof ProveedorArticuloDTO, value: any) => {
@@ -140,7 +180,7 @@ const ProveedorModal = ({
         
         return {
           id: typeof art.id === 'number' ? art.id : 0,
-          fechaHoraBajaArtProv: "",
+          fechaHoraBajaArtProv: art.fechaHoraBajaArtProv || "",
           costoGeneralInventario: art.costoGeneralInventario,
           demoraEntrega: art.demoraEntrega,
           nivelDeServicio: art.nivelDeServicio,
@@ -364,13 +404,42 @@ const ProveedorModal = ({
                       <Card key={index} className="mb-3 border-primary">
                         <Card.Header className="d-flex justify-content-between align-items-center">
                           <h6>Artículo {index + 1}</h6>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => removeProveedorArticulo(index)}
-                          >
-                            Eliminar
-                          </Button>
+                          <div className="d-flex gap-2">
+                            {modalType === ModalType.UPDATE && articulo.id > 0 ? (
+                              // En modo edición Y artículo existente: mostrar lógica de dar de baja/alta
+                              articulo.fechaHoraBajaArtProv ? (
+                                // Solo mostrar "Dar de Alta" si fue modificado temporalmente en este modal
+                                articulosModificadosTemporalmente.has(index) ? (
+                                  <Button
+                                    variant="outline-success"
+                                    size="sm"
+                                    onClick={() => darDeAltaArticuloProveedor(index)}
+                                  >
+                                    Dar de Alta
+                                  </Button>
+                                ) : (
+                                  <span className="text-muted small">Marcado para baja</span>
+                                )
+                              ) : (
+                                <Button
+                                  variant="outline-warning"
+                                  size="sm"
+                                  onClick={() => darDeBajaArticuloProveedor(index)}
+                                >
+                                  Dar de Baja
+                                </Button>
+                              )
+                            ) : (
+                              // En modo creación O artículo nuevo: mostrar botón eliminar normal
+                              <Button
+                                variant="outline-danger"
+                                size="sm"
+                                onClick={() => removeProveedorArticulo(index)}
+                              >
+                                Eliminar
+                              </Button>
+                            )}
+                          </div>
                         </Card.Header>
                         <Card.Body>
                           {/* Selector de Artículo */}
