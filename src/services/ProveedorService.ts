@@ -1,7 +1,7 @@
 import type { ProveedorDTO } from "../types/ProveedorDTO";
 import type { ArticuloDTO } from "../types/ArticuloDTO";
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = '';
 
 const handleResponse = async (response: Response) => {
   const contentType = response.headers.get('content-type');
@@ -18,7 +18,8 @@ const handleResponse = async (response: Response) => {
         errorMessage = `Error parsing error response as JSON: ${await response.text()}`;
       }
     } else {
-      errorMessage = `Unexpected content type: ${contentType}, Message: ${await response.text()}`;
+      const responseText = await response.text();
+      errorMessage = `Unexpected content type: ${contentType}, Message: ${responseText}`;
     }
 
     throw new Error(errorMessage);
@@ -154,19 +155,40 @@ export const ProveedorService = {
   },
 
   bajaLogicaProveedor: async (id: number): Promise<void> => {
-    try {
-      const response = await fetch(`${BASE_URL}/Proveedor/${id}`, {
+   try {
+      const response = await fetch(`${BASE_URL}/Proveedor/bajaProveedor/${id}`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'
-        },
+        }
       });
-      return await handleResponse(response);
+
+      if (!response.ok) {
+        let errorMessage = `Error al eliminar el proveedor: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || JSON.stringify(errorData);
+        } catch (error) {
+          console.error("Error parsing error response:", error);
+        }
+        throw new Error(errorMessage);
+      }
+
+      if (response.status === 204) {
+        return;
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        return data;
+      }
     } catch (error) {
       console.error("Error en la solicitud:", error);
       throw error;
     }
   },
+
 
   listarArticulosPorProveedor: async (proveedor: ProveedorDTO): Promise<ArticuloDTO[]> => {
     try {

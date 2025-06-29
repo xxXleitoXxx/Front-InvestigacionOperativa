@@ -32,20 +32,25 @@ const ProveedorModal = ({
     ProveedorArticuloDTO[]
   >(() => {
     // Asegurar que todos los artículos tengan tipoLote válido
-    const articulosInicializados = (prov.proveedorArticulos || []).map(art => ({
-      ...art,
-      tipoLote: art.tipoLote || TipoLote.LOTEFIJO
-    }));
-    
+    const articulosInicializados = (prov.proveedorArticulos || []).map(
+      (art) => ({
+        ...art,
+        tipoLote: art.tipoLote || TipoLote.LOTEFIJO,
+      })
+    );
+
     console.log("[DEBUG] Inicialización de proveedorArticulos:");
     console.log("Artículos originales:", prov.proveedorArticulos);
     console.log("Artículos inicializados:", articulosInicializados);
-    
+
     return articulosInicializados;
   });
-  
+
   // Estado para rastrear artículos modificados temporalmente
-  const [articulosModificadosTemporalmente, setArticulosModificadosTemporalmente] = useState<Set<number>>(new Set());
+  const [
+    articulosModificadosTemporalmente,
+    setArticulosModificadosTemporalmente,
+  ] = useState<Set<number>>(new Set());
 
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [isLoadingArticulos, setIsLoadingArticulos] = useState(false);
@@ -104,9 +109,12 @@ const ProveedorModal = ({
 
   const addProveedorArticulo = () => {
     const newIndex = proveedorArticulos.length;
-    setProveedorArticulos([...proveedorArticulos, createNewProveedorArticulo()]);
+    setProveedorArticulos([
+      ...proveedorArticulos,
+      createNewProveedorArticulo(),
+    ]);
     // Marcar el nuevo artículo como modificado temporalmente
-    setArticulosModificadosTemporalmente(prev => new Set(prev).add(newIndex));
+    setArticulosModificadosTemporalmente((prev) => new Set(prev).add(newIndex));
   };
 
   const removeProveedorArticulo = (index: number) => {
@@ -117,16 +125,19 @@ const ProveedorModal = ({
   const darDeBajaArticuloProveedor = (index: number) => {
     const newArticulos = [...proveedorArticulos];
     const fechaActual = new Date();
-    const fechaFormateada = fechaActual.toISOString().slice(0, 19).replace('T', ' ');
-    newArticulos[index] = { 
-      ...newArticulos[index], 
-      fechaHoraBajaArtProv: fechaFormateada 
+    const fechaFormateada = fechaActual
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+    newArticulos[index] = {
+      ...newArticulos[index],
+      fechaHoraBajaArtProv: fechaFormateada,
     };
     setProveedorArticulos(newArticulos);
-    
+
     // Marcar como modificado temporalmente
-    setArticulosModificadosTemporalmente(prev => new Set(prev).add(index));
-    
+    setArticulosModificadosTemporalmente((prev) => new Set(prev).add(index));
+
     toast.success("Artículo marcado para dar de baja", {
       position: "top-center",
     });
@@ -134,31 +145,39 @@ const ProveedorModal = ({
 
   const darDeAltaArticuloProveedor = (index: number) => {
     const newArticulos = [...proveedorArticulos];
-    newArticulos[index] = { 
-      ...newArticulos[index], 
-      fechaHoraBajaArtProv: "" 
+    newArticulos[index] = {
+      ...newArticulos[index],
+      fechaHoraBajaArtProv: "",
     };
     setProveedorArticulos(newArticulos);
-    
+
     // Mantener como modificado temporalmente
-    setArticulosModificadosTemporalmente(prev => new Set(prev).add(index));
-    
+    setArticulosModificadosTemporalmente((prev) => new Set(prev).add(index));
+
     toast.success("Artículo marcado para dar de alta", {
       position: "top-center",
     });
   };
 
-  const updateProveedorArticulo = (index: number, field: keyof ProveedorArticuloDTO, value: any) => {
+  const updateProveedorArticulo = (
+    index: number,
+    field: keyof ProveedorArticuloDTO,
+    value: any
+  ) => {
     const newArticulos = [...proveedorArticulos];
     newArticulos[index] = { ...newArticulos[index], [field]: value };
     setProveedorArticulos(newArticulos);
   };
 
-  const updateArticuloDTO = (index: number, field: keyof ArticuloDTO, value: any) => {
+  const updateArticuloDTO = (
+    index: number,
+    field: keyof ArticuloDTO,
+    value: any
+  ) => {
     const newArticulos = [...proveedorArticulos];
-    newArticulos[index] = { 
-      ...newArticulos[index], 
-      articuloDTO: { ...newArticulos[index].articuloDTO, [field]: value }
+    newArticulos[index] = {
+      ...newArticulos[index],
+      articuloDTO: { ...newArticulos[index].articuloDTO, [field]: value },
     };
     setProveedorArticulos(newArticulos);
   };
@@ -166,19 +185,28 @@ const ProveedorModal = ({
   const handleSaveUpdate = async (proveedor: ProveedorDTO) => {
     try {
       // Debug: verificar valores de tipoLote antes del mapeo
-      console.log("[DEBUG] Valores de tipoLote antes del mapeo:", proveedorArticulos.map(art => ({ id: art.articuloDTO.id, tipoLote: art.tipoLote })));
-      
+      console.log(
+        "[DEBUG] Valores de tipoLote antes del mapeo:",
+        proveedorArticulos.map((art) => ({
+          id: art.articuloDTO.id,
+          tipoLote: art.tipoLote,
+        }))
+      );
+
       // Mapeo la estructura de proveedorArticulos
       const proveedorArticulosMapped = proveedorArticulos.map((art) => {
         // Asegurar que tipoLote tenga un valor válido
-        const tipoLoteValue = art.tipoLote && art.tipoLote !== null && art.tipoLote !== undefined 
-          ? art.tipoLote 
-          : TipoLote.LOTEFIJO;
-        
-        console.log(`[DEBUG] Artículo ${art.articuloDTO.id}: tipoLote original = ${art.tipoLote}, tipoLote final = ${tipoLoteValue}`);
-        
+        const tipoLoteValue =
+          art.tipoLote && art.tipoLote !== null && art.tipoLote !== undefined
+            ? art.tipoLote
+            : TipoLote.LOTEFIJO;
+
+        console.log(
+          `[DEBUG] Artículo ${art.articuloDTO.id}: tipoLote original = ${art.tipoLote}, tipoLote final = ${tipoLoteValue}`
+        );
+
         return {
-          id: typeof art.id === 'number' ? art.id : 0,
+          id: typeof art.id === "number" ? art.id : 0,
           fechaHoraBajaArtProv: art.fechaHoraBajaArtProv || "",
           costoGeneralInventario: art.costoGeneralInventario,
           demoraEntrega: art.demoraEntrega,
@@ -193,30 +221,45 @@ const ProveedorModal = ({
           periodoRevision: art.periodoRevision,
           tipoLote: tipoLoteValue,
           articuloDTO: {
-            id: art.articuloDTO.id
-          }
+            id: art.articuloDTO.id,
+          },
         };
       });
 
       // Debug: verificar valores después del mapeo
-      console.log("[DEBUG] Valores de tipoLote después del mapeo:", proveedorArticulosMapped.map(art => ({ id: art.articuloDTO.id, tipoLote: art.tipoLote })));
+      console.log(
+        "[DEBUG] Valores de tipoLote después del mapeo:",
+        proveedorArticulosMapped.map((art) => ({
+          id: art.articuloDTO.id,
+          tipoLote: art.tipoLote,
+        }))
+      );
 
       // Estructura final para enviar
       const datosAEnviar = {
-        id: typeof proveedor.id === 'number' ? proveedor.id : 0,
+        id: typeof proveedor.id === "number" ? proveedor.id : 0,
         codProv: proveedor.codProv,
         nomProv: proveedor.nomProv,
         descripcionProv: proveedor.descripcionProv,
         fechaHoraBajaProv: "",
-        proveedorArticulos: proveedorArticulosMapped
+        proveedorArticulos: proveedorArticulosMapped,
       };
 
-      console.log("[DEBUG] Datos enviados a ProveedorService:", JSON.stringify(datosAEnviar, null, 2));
-      
+      console.log(
+        "[DEBUG] Datos enviados a ProveedorService:",
+        JSON.stringify(datosAEnviar, null, 2)
+      );
+
       // Log específico para tipoLote en cada artículo
-      console.log("[DEBUG] Verificación específica de tipoLote en cada artículo:");
+      console.log(
+        "[DEBUG] Verificación específica de tipoLote en cada artículo:"
+      );
       datosAEnviar.proveedorArticulos.forEach((art, index) => {
-        console.log(`Artículo ${index + 1} (ID: ${art.articuloDTO.id}): tipoLote = "${art.tipoLote}" (tipo: ${typeof art.tipoLote})`);
+        console.log(
+          `Artículo ${index + 1} (ID: ${art.articuloDTO.id}): tipoLote = "${
+            art.tipoLote
+          }" (tipo: ${typeof art.tipoLote})`
+        );
       });
 
       const isNew = proveedor.id === 0;
@@ -247,6 +290,18 @@ const ProveedorModal = ({
 
   const handleDelete = async () => {
     try {
+      console.log("=== DEBUG BAJA LÓGICA PROVEEDOR ===");
+      console.log("Objeto 'prov' completo:", prov);
+      console.log("Tipo de 'prov':", typeof prov);
+      console.log("ID del proveedor:", prov.id);
+      console.log("Código del proveedor:", prov.codProv);
+      console.log("Nombre del proveedor:", prov.nomProv);
+      console.log("Descripción del proveedor:", prov.descripcionProv);
+      console.log("Fecha de baja:", prov.fechaHoraBajaProv);
+      console.log("Proveedor artículos:", prov.proveedorArticulos);
+      console.log("JSON.stringify del objeto:", JSON.stringify(prov, null, 2));
+      console.log("=====================================");
+
       await ProveedorService.bajaLogicaProveedor(prov.id);
       toast.success("Proveedor eliminado con éxito", {
         position: "top-center",
@@ -254,7 +309,18 @@ const ProveedorModal = ({
       onHide();
       refreshData((prevState) => !prevState);
     } catch (error) {
-      console.error(error);
+      console.error("=== ERROR EN BAJA LÓGICA ===");
+      console.error("Error completo:", error);
+      console.error("Tipo de error:", typeof error);
+      console.error(
+        "Mensaje de error:",
+        error instanceof Error ? error.message : String(error)
+      );
+      console.error(
+        "Stack trace:",
+        error instanceof Error ? error.stack : "No disponible"
+      );
+      console.error("===============================");
       toast.error(
         `Ha ocurrido un error: ${
           error instanceof Error ? error.message : String(error)
@@ -313,7 +379,7 @@ const ProveedorModal = ({
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <Modal.Body style={{ maxHeight: "80vh", overflowY: "auto" }}>
             <Form onSubmit={formik.handleSubmit}>
               {/* Información del Proveedor */}
               <Card className="mb-4">
@@ -331,7 +397,9 @@ const ProveedorModal = ({
                           value={formik.values.codProv || ""}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
-                          isInvalid={!!(formik.touched.codProv && formik.errors.codProv)}
+                          isInvalid={
+                            !!(formik.touched.codProv && formik.errors.codProv)
+                          }
                           disabled={modalType !== ModalType.CREATE}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -385,9 +453,9 @@ const ProveedorModal = ({
               <Card className="mb-4">
                 <Card.Header className="d-flex justify-content-between align-items-center">
                   <h5>Artículos del Proveedor</h5>
-                  <Button 
-                    variant="outline-primary" 
-                    size="sm" 
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
                     onClick={addProveedorArticulo}
                   >
                     + Agregar Artículo
@@ -396,7 +464,8 @@ const ProveedorModal = ({
                 <Card.Body>
                   {proveedorArticulos.length === 0 ? (
                     <p className="text-muted text-center">
-                      No hay artículos agregados. Haga clic en "Agregar Artículo" para comenzar.
+                      No hay artículos agregados. Haga clic en "Agregar
+                      Artículo" para comenzar.
                     </p>
                   ) : (
                     proveedorArticulos.map((articulo, index) => (
@@ -404,7 +473,8 @@ const ProveedorModal = ({
                         <Card.Header className="d-flex justify-content-between align-items-center">
                           <h6>Artículo {index + 1}</h6>
                           <div className="d-flex gap-2">
-                            {modalType === ModalType.UPDATE && articulo.id > 0 ? (
+                            {modalType === ModalType.UPDATE &&
+                            articulo.id > 0 ? (
                               // En modo edición Y artículo existente: mostrar lógica de dar de baja/alta
                               articulo.fechaHoraBajaArtProv ? (
                                 // Solo mostrar "Dar de Alta" si fue modificado temporalmente en este modal
@@ -412,18 +482,24 @@ const ProveedorModal = ({
                                   <Button
                                     variant="outline-success"
                                     size="sm"
-                                    onClick={() => darDeAltaArticuloProveedor(index)}
+                                    onClick={() =>
+                                      darDeAltaArticuloProveedor(index)
+                                    }
                                   >
                                     Dar de Alta
                                   </Button>
                                 ) : (
-                                  <span className="text-muted small">Marcado para baja</span>
+                                  <span className="text-muted small">
+                                    Marcado para baja
+                                  </span>
                                 )
                               ) : (
                                 <Button
                                   variant="outline-warning"
                                   size="sm"
-                                  onClick={() => darDeBajaArticuloProveedor(index)}
+                                  onClick={() =>
+                                    darDeBajaArticuloProveedor(index)
+                                  }
                                 >
                                   Dar de Baja
                                 </Button>
@@ -447,32 +523,51 @@ const ProveedorModal = ({
                               <Form.Group>
                                 <Form.Label>Seleccionar Artículo *</Form.Label>
                                 <Form.Select
-                                  value={articulo.articuloDTO.id !== 0 ? articulo.articuloDTO.id : ""}
+                                  value={
+                                    articulo.articuloDTO.id !== 0
+                                      ? articulo.articuloDTO.id
+                                      : ""
+                                  }
                                   onChange={(e) => {
-                                    const selectedArticulo = articulos.find(a => a.id === parseInt(e.target.value));
+                                    const selectedArticulo = articulos.find(
+                                      (a) => a.id === parseInt(e.target.value)
+                                    );
                                     if (selectedArticulo) {
-                                      const newArticulos = [...proveedorArticulos];
+                                      const newArticulos = [
+                                        ...proveedorArticulos,
+                                      ];
                                       newArticulos[index] = {
                                         ...newArticulos[index],
-                                        articuloDTO: selectedArticulo
+                                        articuloDTO: selectedArticulo,
                                       };
                                       setProveedorArticulos(newArticulos);
                                     }
                                   }}
                                   disabled={isLoadingArticulos}
                                 >
-                                  <option value="">Seleccione un artículo...</option>
+                                  <option value="">
+                                    Seleccione un artículo...
+                                  </option>
                                   {articulos
-                                    .filter(art => {
+                                    .filter((art) => {
                                       // Filtrar artículos que ya están seleccionados en otros índices
-                                      const isSelectedInOtherIndex = proveedorArticulos.some((proveedorArt, otherIndex) => 
-                                        otherIndex !== index && proveedorArt.articuloDTO.id === art.id
-                                      );
-                                      
+                                      const isSelectedInOtherIndex =
+                                        proveedorArticulos.some(
+                                          (proveedorArt, otherIndex) =>
+                                            otherIndex !== index &&
+                                            proveedorArt.articuloDTO.id ===
+                                              art.id
+                                        );
+
                                       // Filtrar artículos que están dados de baja
-                                      const isArticuloDadoDeBaja = art.fechaHoraBajaArt && art.fechaHoraBajaArt.trim() !== "";
-                                      
-                                      return !isSelectedInOtherIndex && !isArticuloDadoDeBaja;
+                                      const isArticuloDadoDeBaja =
+                                        art.fechaHoraBajaArt &&
+                                        art.fechaHoraBajaArt.trim() !== "";
+
+                                      return (
+                                        !isSelectedInOtherIndex &&
+                                        !isArticuloDadoDeBaja
+                                      );
                                     })
                                     .map((art) => (
                                       <option key={art.id} value={art.id}>
@@ -487,7 +582,9 @@ const ProveedorModal = ({
                           <Row>
                             <Col md={6}>
                               <Form.Group className="mb-3">
-                                <Form.Label>Costo General de Inventario</Form.Label>
+                                <Form.Label>
+                                  Costo General de Inventario
+                                </Form.Label>
                                 <Form.Control
                                   type="number"
                                   step="0.01"
@@ -499,11 +596,19 @@ const ProveedorModal = ({
                             </Col>
                             <Col md={6}>
                               <Form.Group className="mb-3">
-                                <Form.Label>Demora de Entrega (días)</Form.Label>
+                                <Form.Label>
+                                  Demora de Entrega (días)
+                                </Form.Label>
                                 <Form.Control
                                   type="number"
                                   value={articulo.demoraEntrega}
-                                  onChange={(e) => updateProveedorArticulo(index, 'demoraEntrega', parseInt(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "demoraEntrega",
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
                                 />
                               </Form.Group>
                             </Col>
@@ -514,7 +619,13 @@ const ProveedorModal = ({
                                 <Form.Label>Nivel de Servicio (%)</Form.Label>
                                 <Form.Select
                                   value={articulo.nivelDeServicio}
-                                  onChange={(e) => updateProveedorArticulo(index, 'nivelDeServicio', parseInt(e.target.value) || 95)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "nivelDeServicio",
+                                      parseInt(e.target.value) || 95
+                                    )
+                                  }
                                 >
                                   <option value={85}>85%</option>
                                   <option value={95}>95%</option>
@@ -528,7 +639,13 @@ const ProveedorModal = ({
                                   type="number"
                                   step="0.01"
                                   value={articulo.costoUnitario}
-                                  onChange={(e) => updateProveedorArticulo(index, 'costoUnitario', parseFloat(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "costoUnitario",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
                                 />
                               </Form.Group>
                             </Col>
@@ -541,7 +658,13 @@ const ProveedorModal = ({
                                   type="number"
                                   step="0.01"
                                   value={articulo.costoPedido}
-                                  onChange={(e) => updateProveedorArticulo(index, 'costoPedido', parseFloat(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "costoPedido",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
                                 />
                               </Form.Group>
                             </Col>
@@ -552,7 +675,13 @@ const ProveedorModal = ({
                                   type="number"
                                   step="0.01"
                                   value={articulo.costoMantenimiento}
-                                  onChange={(e) => updateProveedorArticulo(index, 'costoMantenimiento', parseFloat(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "costoMantenimiento",
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
                                 />
                               </Form.Group>
                             </Col>
@@ -608,11 +737,19 @@ const ProveedorModal = ({
                           <Row>
                             <Col md={6}>
                               <Form.Group className="mb-3">
-                                <Form.Label>Período de Revisión (días)</Form.Label>
+                                <Form.Label>
+                                  Período de Revisión (días)
+                                </Form.Label>
                                 <Form.Control
                                   type="number"
                                   value={articulo.periodoRevision}
-                                  onChange={(e) => updateProveedorArticulo(index, 'periodoRevision', parseInt(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "periodoRevision",
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
                                 />
                               </Form.Group>
                             </Col>
@@ -621,10 +758,20 @@ const ProveedorModal = ({
                                 <Form.Label>Tipo de Lote</Form.Label>
                                 <Form.Select
                                   value={articulo.tipoLote || TipoLote.LOTEFIJO}
-                                  onChange={(e) => updateProveedorArticulo(index, 'tipoLote', e.target.value as TipoLote)}
+                                  onChange={(e) =>
+                                    updateProveedorArticulo(
+                                      index,
+                                      "tipoLote",
+                                      e.target.value as TipoLote
+                                    )
+                                  }
                                 >
-                                  <option value={TipoLote.LOTEFIJO}>Lote Fijo</option>
-                                  <option value={TipoLote.PERIODOFIJO}>Período Fijo</option>
+                                  <option value={TipoLote.LOTEFIJO}>
+                                    Lote Fijo
+                                  </option>
+                                  <option value={TipoLote.PERIODOFIJO}>
+                                    Período Fijo
+                                  </option>
                                 </Form.Select>
                               </Form.Group>
                             </Col>
