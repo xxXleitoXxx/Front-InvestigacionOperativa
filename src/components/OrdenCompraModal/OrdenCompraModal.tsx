@@ -40,6 +40,7 @@ const OrdenCompraModal = ({
   const [proveedorSearch, setProveedorSearch] = useState("");
   const [selectedArticulo, setSelectedArticulo] = useState<ArticuloDTO | null>(null);
   const [selectedProveedor, setSelectedProveedor] = useState<ProveedorDTO | null>(null);
+  const [isLoadingCantidad, setIsLoadingCantidad] = useState(false);
 
   useEffect(() => {
     const fetchArticulos = async () => {
@@ -182,8 +183,50 @@ const OrdenCompraModal = ({
     )
   );
 
-  const addArticuloToProveedor = (articulo: ArticuloDTO) => {
+  const addArticuloToProveedor = async (articulo: ArticuloDTO) => {
     setSelectedArticulo(articulo);
+    
+    // Obtener la cantidad recomendada del backend
+    setIsLoadingCantidad(true);
+    try {
+      console.log("Obteniendo cantidad recomendada para:", articulo);
+      
+      // Convertir ArticuloDTO a ArticuloOCDTO para el servicio
+      const articuloParaServicio = {
+        id: articulo.id,
+        nomArt: articulo.nomArt
+      };
+      
+      const cantidadRecomendada = await OrdenCompraService.cantRecomendad(articuloParaServicio);
+      console.log("Cantidad recomendada recibida:", cantidadRecomendada);
+      
+      // Extraer la cantidad recomendada de la respuesta
+      let cantidad = 0;
+      if (cantidadRecomendada && typeof cantidadRecomendada === 'object') {
+        console.log("Propiedades de la respuesta:", Object.keys(cantidadRecomendada));
+        cantidad = cantidadRecomendada.cantidad || 
+                 cantidadRecomendada.cantRecomendada || 
+                 cantidadRecomendada.data || 
+                 cantidadRecomendada.body || 
+                 cantidadRecomendada.message || 
+                 0;
+      } else if (typeof cantidadRecomendada === 'number') {
+        cantidad = cantidadRecomendada;
+      }
+      
+      console.log("Cantidad extraída:", cantidad);
+      
+      // Actualizar el campo de cantidad en el formulario
+      formik.setFieldValue("cantPedida", cantidad);
+      console.log("Campo cantPedida actualizado con:", cantidad);
+      
+    } catch (error) {
+      console.error("Error al obtener cantidad recomendada:", error);
+      // Si hay error, mantener la cantidad actual o poner 0
+      formik.setFieldValue("cantPedida", 0);
+    } finally {
+      setIsLoadingCantidad(false);
+    }
   };
 
   const validationSchema = Yup.object().shape({
@@ -243,13 +286,18 @@ const OrdenCompraModal = ({
 
           {/* 3. Cantidad */}
           <Form.Group>
-            <Form.Label>Cantidad a pedir</Form.Label>
+            <Form.Label>
+              Cantidad a pedir 
+              {isLoadingCantidad && <span style={{ color: 'blue', marginLeft: '5px' }}>⏳ Cargando cantidad recomendada...</span>}
+            </Form.Label>
             <Form.Control
               type="number"
               name="cantPedida"
               value={formik.values.cantPedida}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              disabled={isLoadingCantidad}
+              placeholder={isLoadingCantidad ? "Cargando..." : "Ingrese la cantidad"}
             />
             {formik.touched.cantPedida && formik.errors.cantPedida ? (
               <div className="text-danger">{formik.errors.cantPedida}</div>

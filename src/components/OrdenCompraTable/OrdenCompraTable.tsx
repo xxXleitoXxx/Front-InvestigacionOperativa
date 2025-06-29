@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import Loader from "../Loader/Loader";
 import { ModalType } from "../../types/ModalType";
@@ -229,42 +229,80 @@ const OrdenCompraTable = () => {
             </tr>
           </thead>
           <tbody>
-            {ordencompras.map((OC) => (
-              <tr key={OC.id}>
-                <td>{OC.id}</td>
-                <td>{OC.articuloDTO?.nomArt}</td>
-                <td>{OC.cantPedida}</td>
-                <td>{OC.proveedorDTO?.nomProv}</td>
-                <td>${OC.montoTotal?.toFixed(2) || '0.00'}</td>
-                <td>{OC.fechaPedidoOrdCom}</td>
-                <td>{OC.fechaLlegadaOrdCom}</td>
-                <td>{OC.estadoOrdenCompraDTO?.nomEOC}</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() =>
-                      handleClick("Editar artículo", OC, ModalType.UPDATE)
-                    }
-                    disabled={isLoading || OC.estadoOrdenCompraDTO?.id === 3 || OC.estadoOrdenCompraDTO?.id === 4}
-                  >
-                    {OC.estadoOrdenCompraDTO?.id === 1 ? "Enviada" :
-                     OC.estadoOrdenCompraDTO?.id === 2 ? "Finalizar" :
-                     "Editar"}
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleCancelarOrden(OC)}
-                    disabled={isLoading}
-                  >
-                    Cancelar
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {(() => {
+              const sortedOrdenes = ordencompras.sort((a, b) => (a.estadoOrdenCompraDTO?.id || 0) - (b.estadoOrdenCompraDTO?.id || 0));
+              const groupedOrdenes = sortedOrdenes.reduce((groups, orden) => {
+                const estadoId = orden.estadoOrdenCompraDTO?.id || 0;
+                if (!groups[estadoId]) {
+                  groups[estadoId] = [];
+                }
+                groups[estadoId].push(orden);
+                return groups;
+              }, {} as Record<number, OrdenCompraDTO[]>);
+
+              const rows: React.ReactElement[] = [];
+              
+              Object.entries(groupedOrdenes).forEach(([estadoId, ordenes]) => {
+                const estadoNombre = ordenes[0]?.estadoOrdenCompraDTO?.nomEOC || 'Sin Estado';
+                const estadoColor = {
+                  1: '#e3f2fd', // Azul claro para pendientes
+                  2: '#fff3e0', // Naranja claro para en proceso
+                  3: '#e8f5e8', // Verde claro para finalizadas
+                  4: '#ffebee'  // Rojo claro para canceladas
+                }[Number(estadoId)] || '#f5f5f5';
+
+                // Agregar separador de estado
+                rows.push(
+                  <tr key={`header-${estadoId}`} style={{ backgroundColor: estadoColor }}>
+                    <td colSpan={10} style={{ fontWeight: 'bold', textAlign: 'center', padding: '10px' }}>
+                      📋 {estadoNombre.toUpperCase()} ({ordenes.length} orden{ordenes.length !== 1 ? 'es' : ''})
+                    </td>
+                  </tr>
+                );
+
+                // Agregar filas de órdenes
+                ordenes.forEach((OC) => {
+                  rows.push(
+                    <tr key={OC.id}>
+                      <td>{OC.id}</td>
+                      <td>{OC.articuloDTO?.nomArt}</td>
+                      <td>{OC.cantPedida}</td>
+                      <td>{OC.proveedorDTO?.nomProv}</td>
+                      <td>${OC.montoTotal?.toFixed(2) || '0.00'}</td>
+                      <td>{OC.fechaPedidoOrdCom}</td>
+                      <td>{OC.fechaLlegadaOrdCom}</td>
+                      <td>{OC.estadoOrdenCompraDTO?.nomEOC}</td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() =>
+                            handleClick("Editar artículo", OC, ModalType.UPDATE)
+                          }
+                          disabled={isLoading || OC.estadoOrdenCompraDTO?.id === 3 || OC.estadoOrdenCompraDTO?.id === 4}
+                        >
+                          {OC.estadoOrdenCompraDTO?.id === 1 ? "Enviada" :
+                           OC.estadoOrdenCompraDTO?.id === 2 ? "Finalizar" :
+                           "Editar"}
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleCancelarOrden(OC)}
+                          disabled={isLoading}
+                        >
+                          Cancelar
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                });
+              });
+
+              return rows;
+            })()}
           </tbody>
         </Table>
       )}

@@ -1,3 +1,5 @@
+import ArticuloModal from "../components/ArticuloModal/ArticuloModal";
+import type { ArticuloOCDTO } from "../types/ArticuloOCDTO";
 import type { OrdenCompraDTO } from "../types/OrdenCompraDTO";
 
 const BASE_URL = 'http://localhost:8080';
@@ -113,8 +115,24 @@ export const OrdenCompraService = {
       throw error;
     }
 
-  }
-,
+  },
+
+  cantRecomendad: async(Articulo: ArticuloOCDTO):Promise<any>=>{
+    try{
+        const response = await fetch(`${BASE_URL}/OrdenCompra/Cant`,{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(Articulo)
+        });         
+        return await handleResponse(response);
+    }catch (error) {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    }
+  },
+
   updateOrdenCompra: async (id: number, OrdenCompra: OrdenCompraDTO): Promise<OrdenCompraDTO> => {
     try {
       const response = await fetch(`${BASE_URL}/OrdenCompra/mod`, {
