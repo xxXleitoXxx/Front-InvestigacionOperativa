@@ -1,4 +1,5 @@
 import type { ArticuloDTO } from "../types/ArticuloDTO";
+import type { ArticuloProvDTO } from "../types/ArticuloProvDTO";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -150,6 +151,32 @@ export const ArticuloService = {
       return await handleResponse(response);
     } catch (error) {
       console.error("Error en la solicitud de productos a reponer:", error);
+      throw error;
+    }
+  },
+
+  listarProveedoresPorArticulo: async (articulo: ArticuloDTO): Promise<ArticuloProvDTO[]> => {
+    try {
+      console.log("[DEBUG] ArticuloService - Enviando POST a /Articulo/proveedoresPorArticulo");
+      console.log("[DEBUG] ArticuloService - Datos enviados:", JSON.stringify(articulo, null, 2));
+      
+      const response = await fetch(`${BASE_URL}/Articulo/proveedoresPorArticulo`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(articulo)
+      });
+      
+      console.log("[DEBUG] ArticuloService - Status de respuesta:", response.status);
+      console.log("[DEBUG] ArticuloService - Headers de respuesta:", Object.fromEntries(response.headers.entries()));
+      
+      const result = await handleResponse(response);
+      console.log("[DEBUG] ArticuloService - Resultado procesado:", result);
+      
+      return result;
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
       throw error;
     }
   }

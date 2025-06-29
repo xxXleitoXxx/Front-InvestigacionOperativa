@@ -290,18 +290,6 @@ const ProveedorModal = ({
 
   const handleDelete = async () => {
     try {
-      console.log("=== DEBUG BAJA LÓGICA PROVEEDOR ===");
-      console.log("Objeto 'prov' completo:", prov);
-      console.log("Tipo de 'prov':", typeof prov);
-      console.log("ID del proveedor:", prov.id);
-      console.log("Código del proveedor:", prov.codProv);
-      console.log("Nombre del proveedor:", prov.nomProv);
-      console.log("Descripción del proveedor:", prov.descripcionProv);
-      console.log("Fecha de baja:", prov.fechaHoraBajaProv);
-      console.log("Proveedor artículos:", prov.proveedorArticulos);
-      console.log("JSON.stringify del objeto:", JSON.stringify(prov, null, 2));
-      console.log("=====================================");
-
       await ProveedorService.bajaLogicaProveedor(prov.id);
       toast.success("Proveedor eliminado con éxito", {
         position: "top-center",
@@ -309,18 +297,7 @@ const ProveedorModal = ({
       onHide();
       refreshData((prevState) => !prevState);
     } catch (error) {
-      console.error("=== ERROR EN BAJA LÓGICA ===");
-      console.error("Error completo:", error);
-      console.error("Tipo de error:", typeof error);
-      console.error(
-        "Mensaje de error:",
-        error instanceof Error ? error.message : String(error)
-      );
-      console.error(
-        "Stack trace:",
-        error instanceof Error ? error.stack : "No disponible"
-      );
-      console.error("===============================");
+      console.error(error);
       toast.error(
         `Ha ocurrido un error: ${
           error instanceof Error ? error.message : String(error)
@@ -490,7 +467,7 @@ const ProveedorModal = ({
                                   </Button>
                                 ) : (
                                   <span className="text-muted small">
-                                    Marcado para baja
+                                    proveedor articulo dado de baja
                                   </span>
                                 )
                               ) : (
