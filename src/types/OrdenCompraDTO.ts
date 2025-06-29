@@ -8,7 +8,6 @@ export interface OrdenCompraDTO {
   estadoOrdenCompraDTO: EstadoOrdenCompraDTO;
   cantPedida: number;
   proveedorDTO: ProveedorOCDTO;
-  fecha: string; // formato ISO, ej: "2025-06-26"
   montoTotal: number;
   fechaPedidoOrdCom: string; // LocalDateTime → string ISO
   fechaLlegadaOrdCom: string;
