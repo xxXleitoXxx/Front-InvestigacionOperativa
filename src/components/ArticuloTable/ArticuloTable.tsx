@@ -74,13 +74,23 @@ const ArticuloTable = () => {
     fetchArticulos();
   }, [refreshData]);
 
-  const [tablaModo, setTablaModo] = useState<'todos' | 'faltantes' | 'areponer'>('todos');
+  // Estado para el filtro activo (solo uno a la vez)
+  const [filtroActivo, setFiltroActivo] = useState<'todos' | 'faltantes' | 'areponer' | 'activos' | 'dadosDeBaja'>('todos');
   const [isLoadingFiltro, setIsLoadingFiltro] = useState(false);
   const [errorFiltro, setErrorFiltro] = useState<string | null>(null);
 
-  const handleMostrarTodos = () => {
-    setTablaModo('todos');
+  const handleMostrarTodos = async () => {
+    setIsLoadingFiltro(true);
     setErrorFiltro(null);
+    try {
+      const data = await ArticuloService.getArticulos();
+      setArticulos(data);
+      setFiltroActivo('todos');
+    } catch (e) {
+      setErrorFiltro('Error al cargar todos los artículos');
+    } finally {
+      setIsLoadingFiltro(false);
+    }
   };
 
   const handleMostrarFaltantes = async () => {
@@ -89,7 +99,7 @@ const ArticuloTable = () => {
     try {
       const data = await ArticuloService.getProductosFaltantes();
       setArticulos(data);
-      setTablaModo('faltantes');
+      setFiltroActivo('faltantes');
     } catch (e) {
       setErrorFiltro('Error al cargar artículos faltantes');
     } finally {
@@ -103,7 +113,7 @@ const ArticuloTable = () => {
     try {
       const data = await ArticuloService.getProductosAReponer();
       setArticulos(data);
-      setTablaModo('areponer');
+      setFiltroActivo('areponer');
     } catch (e) {
       setErrorFiltro('Error al cargar artículos a reponer');
     } finally {
@@ -111,35 +121,30 @@ const ArticuloTable = () => {
     }
   };
 
-  const [filtroFaltantes, setFiltroFaltantes] = useState(false);
-  const [filtroAReponer, setFiltroAReponer] = useState(false);
-  const [filtroDadoDeBaja, setFiltroDadoDeBaja] = useState(false);
-  const [filtroActivos, setFiltroActivos] = useState(false);
+  const handleMostrarActivos = () => {
+    setFiltroActivo('activos');
+    setErrorFiltro(null);
+  };
+
+  const handleMostrarDadosDeBaja = () => {
+    setFiltroActivo('dadosDeBaja');
+    setErrorFiltro(null);
+  };
 
   // Filtrado local
   const articulosFiltrados = articulos.filter((art) => {
-    let pasa = true;
-    // Filtro de artículos activos (no dados de baja)
-    if (filtroActivos) {
-      pasa = pasa && (!art.fechaHoraBajaArt || art.fechaHoraBajaArt.trim() === "");
+    switch (filtroActivo) {
+      case 'activos':
+        return !art.fechaHoraBajaArt || art.fechaHoraBajaArt.trim() === "";
+      case 'dadosDeBaja':
+        return art.fechaHoraBajaArt && art.fechaHoraBajaArt.trim() !== "";
+      case 'faltantes':
+      case 'areponer':
+        // Para estos filtros, los datos ya vienen filtrados del backend
+        return true;
+      default:
+        return true; // 'todos'
     }
-    // Filtros de stock
-    if (tablaModo === 'areponer' || tablaModo === 'faltantes') {
-      // No aplicar filtroAReponer ni filtroFaltantes local, ya que los datos ya vienen filtrados del backend
-    } else {
-      if (filtroFaltantes && filtroAReponer) {
-        pasa = pasa && (art.stock === 0 || art.stock < art.stockSeguridad);
-      } else if (filtroFaltantes) {
-        pasa = pasa && art.stock === 0;
-      } else if (filtroAReponer) {
-        pasa = pasa && art.stock < art.stockSeguridad;
-      }
-    }
-    // Filtro de artículos dados de baja
-    if (filtroDadoDeBaja) {
-      pasa = pasa && art.fechaHoraBajaArt != null;
-    }
-    return pasa;
   });
 
   return (
@@ -158,54 +163,39 @@ const ArticuloTable = () => {
           Nuevo Artículo
         </Button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <label>
-            <input
-              type="checkbox"
-              checked={filtroActivos}
-              onChange={() => setFiltroActivos((v) => !v)}
-            />
+          <Button
+            variant={filtroActivo === 'todos' ? 'primary' : 'outline-primary'}
+            onClick={handleMostrarTodos}
+            disabled={isLoadingFiltro}
+          >
+            Mostrar todos
+          </Button>
+          <Button
+            variant={filtroActivo === 'activos' ? 'primary' : 'outline-primary'}
+            onClick={handleMostrarActivos}
+          >
             Artículos activos
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={filtroFaltantes}
-              onChange={async () => {
-                const nuevoValor = !filtroFaltantes;
-                setFiltroFaltantes(nuevoValor);
-                if (nuevoValor) {
-                  await handleMostrarFaltantes();
-                } else {
-                  handleMostrarTodos();
-                }
-              }}
-            />
-            Artículos faltantes
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={filtroAReponer}
-              onChange={async () => {
-                const nuevoValor = !filtroAReponer;
-                setFiltroAReponer(nuevoValor);
-                if (nuevoValor) {
-                  await handleMostrarAReponer();
-                } else {
-                  handleMostrarTodos();
-                }
-              }}
-            />
-            Artículos a reponer
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={filtroDadoDeBaja}
-              onChange={() => setFiltroDadoDeBaja((v) => !v)}
-            />
+          </Button>
+          <Button
+            variant={filtroActivo === 'dadosDeBaja' ? 'primary' : 'outline-primary'}
+            onClick={handleMostrarDadosDeBaja}
+          >
             Artículos dados de baja
-          </label>
+          </Button>
+          <Button
+            variant={filtroActivo === 'faltantes' ? 'primary' : 'outline-primary'}
+            onClick={handleMostrarFaltantes}
+            disabled={isLoadingFiltro}
+          >
+            Artículos faltantes
+          </Button>
+          <Button
+            variant={filtroActivo === 'areponer' ? 'primary' : 'outline-primary'}
+            onClick={handleMostrarAReponer}
+            disabled={isLoadingFiltro}
+          >
+            Artículos a reponer
+          </Button>
         </div>
       </div>
       {isLoading ? (
