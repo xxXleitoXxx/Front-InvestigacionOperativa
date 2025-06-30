@@ -82,7 +82,24 @@ const OrdenCompraTable = () => {
         }
       } catch (error) {
         console.error('Error al procesar la orden:', error);
-        toast.error('Error al procesar la orden');
+        
+        // Extraer el mensaje de error específico del backend
+        let errorMessage = "Error al procesar la orden";
+        
+        if (error instanceof Error) {
+          // El servicio ya procesa el error del backend y lo convierte en Error.message
+          errorMessage = error.message;
+          
+          // Si el mensaje contiene "Error:", lo removemos para mostrar solo el mensaje específico
+          if (errorMessage.startsWith("Error:")) {
+            errorMessage = errorMessage.replace("Error:", "").trim();
+          }
+        } else {
+          errorMessage = String(error);
+        }
+        
+        toast.error(errorMessage);
+        setRefreshData(prev => !prev);
         setIsLoading(false);
         return;
       } finally {

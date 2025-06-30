@@ -179,11 +179,25 @@ const OrdenCompraModal = ({
       refreshData((prevState) => !prevState);
     } catch (error) {
       console.error(error);
-      toast.error(
-        `Ha ocurrido un error: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
+      
+      // Extraer el mensaje de error específico del backend
+      let errorMessage = "Ha ocurrido un error";
+      
+      if (error instanceof Error) {
+        // El servicio ya procesa el error del backend y lo convierte en Error.message
+        errorMessage = error.message;
+        
+        // Si el mensaje contiene "Error:", lo removemos para mostrar solo el mensaje específico
+        if (errorMessage.startsWith("Error:")) {
+          errorMessage = errorMessage.replace("Error:", "").trim();
+        }
+      } else {
+        errorMessage = String(error);
+      }
+      
+      toast.error(errorMessage, {
+        position: "top-center",
+      });
     }
   };
 
