@@ -178,7 +178,15 @@ const ArticuloTable = () => {
             <input
               type="checkbox"
               checked={filtroAReponer}
-              onChange={() => setFiltroAReponer((v) => !v)}
+              onChange={async () => {
+                const nuevoValor = !filtroAReponer;
+                setFiltroAReponer(nuevoValor);
+                if (nuevoValor) {
+                  await handleMostrarAReponer();
+                } else {
+                  handleMostrarTodos();
+                }
+              }}
             />
             Artículos a reponer
           </label>
