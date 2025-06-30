@@ -55,6 +55,10 @@ const ProveedorModal = ({
   const [articulos, setArticulos] = useState<ArticuloDTO[]>([]);
   const [isLoadingArticulos, setIsLoadingArticulos] = useState(false);
 
+  // Dentro del componente ProveedorModal
+  const [filtroActivos, setFiltroActivos] = useState(true);
+  const [filtroBaja, setFiltroBaja] = useState(false);
+
   // Cargar artículos disponibles
   useEffect(() => {
     const fetchArticulos = async () => {
@@ -429,7 +433,27 @@ const ProveedorModal = ({
               {/* Artículos del Proveedor */}
               <Card className="mb-4">
                 <Card.Header className="d-flex justify-content-between align-items-center">
-                  <h5>Artículos del Proveedor</h5>
+                  <div className="d-flex align-items-center gap-3">
+                    <h5 className="mb-0">Artículos del Proveedor</h5>
+                    {modalType === ModalType.UPDATE && (
+                      <div className="d-flex align-items-center gap-2">
+                        <Form.Check
+                          type="checkbox"
+                          id="filtro-activos"
+                          label="Activos"
+                          checked={filtroActivos}
+                          onChange={() => setFiltroActivos((prev) => !prev)}
+                        />
+                        <Form.Check
+                          type="checkbox"
+                          id="filtro-baja"
+                          label="Dados de baja"
+                          checked={filtroBaja}
+                          onChange={() => setFiltroBaja((prev) => !prev)}
+                        />
+                      </div>
+                    )}
+                  </div>
                   <Button
                     variant="outline-primary"
                     size="sm"
@@ -439,13 +463,25 @@ const ProveedorModal = ({
                   </Button>
                 </Card.Header>
                 <Card.Body>
-                  {proveedorArticulos.length === 0 ? (
+                  {proveedorArticulos.filter((articulo) => {
+                    const isActivo = !articulo.fechaHoraBajaArtProv;
+                    if (filtroActivos && filtroBaja) return true;
+                    if (filtroActivos) return isActivo;
+                    if (filtroBaja) return !isActivo;
+                    return false;
+                  }).length === 0 ? (
                     <p className="text-muted text-center">
                       No hay artículos agregados. Haga clic en "Agregar
                       Artículo" para comenzar.
                     </p>
                   ) : (
-                    proveedorArticulos.map((articulo, index) => (
+                    proveedorArticulos.filter((articulo) => {
+                      const isActivo = !articulo.fechaHoraBajaArtProv;
+                      if (filtroActivos && filtroBaja) return true;
+                      if (filtroActivos) return isActivo;
+                      if (filtroBaja) return !isActivo;
+                      return false;
+                    }).map((articulo, index) => (
                       <Card key={index} className="mb-3 border-primary">
                         <Card.Header className="d-flex justify-content-between align-items-center">
                           <h6>Artículo {index + 1}</h6>
@@ -466,9 +502,14 @@ const ProveedorModal = ({
                                     Dar de Alta
                                   </Button>
                                 ) : (
-                                  <span className="text-muted small">
-                                    proveedor articulo dado de baja
-                                  </span>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span className="text-muted small">
+                                      Proveedor artículo dado de baja
+                                    </span>
+                                    <span className="text-muted small">
+                                      ({new Date(articulo.fechaHoraBajaArtProv).toLocaleString()})
+                                    </span>
+                                  </div>
                                 )
                               ) : (
                                 <Button
@@ -493,7 +534,7 @@ const ProveedorModal = ({
                             )}
                           </div>
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body className={articulo.fechaHoraBajaArtProv ? "text-muted" : ""}>
                           {/* Selector de Artículo */}
                           <Row className="mb-3">
                             <Col md={12}>
@@ -520,27 +561,31 @@ const ProveedorModal = ({
                                       setProveedorArticulos(newArticulos);
                                     }
                                   }}
-                                  disabled={isLoadingArticulos}
+                                  disabled={isLoadingArticulos || !!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 >
                                   <option value="">
                                     Seleccione un artículo...
                                   </option>
                                   {articulos
                                     .filter((art) => {
-                                      // Filtrar artículos que ya están seleccionados en otros índices
+                                      // Filtrar artículos que ya están seleccionados en otros índices (solo los activos)
                                       const isSelectedInOtherIndex =
                                         proveedorArticulos.some(
                                           (proveedorArt, otherIndex) =>
                                             otherIndex !== index &&
-                                            proveedorArt.articuloDTO.id ===
-                                              art.id
+                                            proveedorArt.articuloDTO.id === art.id &&
+                                            !proveedorArt.fechaHoraBajaArtProv // Solo considerar activos como ya seleccionados
                                         );
 
-                                      // Filtrar artículos que están dados de baja
+                                      // Filtrar artículos que están dados de baja - NO se pueden seleccionar
                                       const isArticuloDadoDeBaja =
                                         art.fechaHoraBajaArt &&
                                         art.fechaHoraBajaArt.trim() !== "";
 
+                                      // Permitir el artículo si:
+                                      // 1. No está seleccionado en otro índice Y
+                                      // 2. No está dado de baja
                                       return (
                                         !isSelectedInOtherIndex &&
                                         !isArticuloDadoDeBaja
@@ -586,6 +631,8 @@ const ProveedorModal = ({
                                       parseInt(e.target.value) || 0
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 />
                               </Form.Group>
                             </Col>
@@ -603,6 +650,8 @@ const ProveedorModal = ({
                                       parseInt(e.target.value) || 95
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 >
                                   <option value={85}>85%</option>
                                   <option value={95}>95%</option>
@@ -623,6 +672,8 @@ const ProveedorModal = ({
                                       parseFloat(e.target.value) || 0
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 />
                               </Form.Group>
                             </Col>
@@ -642,6 +693,8 @@ const ProveedorModal = ({
                                       parseFloat(e.target.value) || 0
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 />
                               </Form.Group>
                             </Col>
@@ -659,6 +712,8 @@ const ProveedorModal = ({
                                       parseFloat(e.target.value) || 0
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 />
                               </Form.Group>
                             </Col>
@@ -727,6 +782,8 @@ const ProveedorModal = ({
                                       parseInt(e.target.value) || 0
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 />
                               </Form.Group>
                             </Col>
@@ -742,6 +799,8 @@ const ProveedorModal = ({
                                       e.target.value as TipoLote
                                     )
                                   }
+                                  disabled={!!articulo.fechaHoraBajaArtProv}
+                                  className={articulo.fechaHoraBajaArtProv ? "bg-secondary-subtle text-muted" : ""}
                                 >
                                   <option value={TipoLote.LOTEFIJO}>
                                     Lote Fijo
