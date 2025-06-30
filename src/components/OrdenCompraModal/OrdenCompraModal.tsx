@@ -76,6 +76,22 @@ const OrdenCompraModal = ({
     fetchProveedores();
   }, []);
 
+  // Inicializar selectedArticulo y selectedProveedor cuando se abre el modal para editar
+  useEffect(() => {
+    if (show && orden && orden.articuloDTO && orden.articuloDTO.id && articulos.length > 0) {
+      const articuloCompleto = articulos.find(art => art.id === orden.articuloDTO.id);
+      if (articuloCompleto) {
+        setSelectedArticulo(articuloCompleto);
+      }
+    }
+    if (show && orden && orden.proveedorDTO && orden.proveedorDTO.id && proveedores.length > 0) {
+      const proveedorCompleto = proveedores.find(prov => prov.id === orden.proveedorDTO.id);
+      if (proveedorCompleto) {
+        setSelectedProveedor(proveedorCompleto);
+      }
+    }
+  }, [show, orden, articulos, proveedores]);
+
   const handleSaveUpdate = async (ordenFormik: OrdenCompraDTO) => {
     try {
       if (!ordenFormik.articuloDTO || !ordenFormik.proveedorDTO) {
@@ -180,7 +196,9 @@ const OrdenCompraModal = ({
   const filteredProveedores = proveedores.filter((proveedor) =>
     proveedor.proveedorArticulos.some(
       (pa) => pa.articuloDTO.id === selectedArticulo?.id
-    )
+    ) || 
+    // Incluir el proveedor actual cuando se está editando
+    (orden.id && orden.proveedorDTO?.id === proveedor.id)
   );
 
   const addArticuloToProveedor = async (articulo: ArticuloDTO) => {

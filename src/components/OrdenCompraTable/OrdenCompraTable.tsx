@@ -36,8 +36,18 @@ const OrdenCompraTable = () => {
   const handleClick = async (
     newTitle: string,
     OC: OrdenCompraDTO,
-    modal: ModalType
+    modal: ModalType,
+    isEditingData: boolean = false
   ) => {
+    // Si es edición de datos (nuevo botón Editar), abrir modal directamente
+    if (isEditingData) {
+      setTitle(newTitle);
+      setModalType(modal);
+      setOrdenCompra(OC);
+      setShowModal(true);
+      return;
+    }
+
     // Si es edición, verificar el estado de la orden
     if (modal === ModalType.UPDATE) {
       try {
@@ -224,8 +234,9 @@ const OrdenCompraTable = () => {
               <th>Fecha Pedido</th>
               <th>Fecha Llegada</th>
               <th>Estado</th>
-              <th>Editar</th>
+              <th>Estado</th>
               <th>Cancelar</th>
+              <th>Editar</th>
             </tr>
           </thead>
           <tbody>
@@ -277,13 +288,13 @@ const OrdenCompraTable = () => {
                           variant="primary"
                           size="sm"
                           onClick={() =>
-                            handleClick("Editar artículo", OC, ModalType.UPDATE)
+                            handleClick("Editar artículo", OC, ModalType.UPDATE, false)
                           }
                           disabled={isLoading || OC.estadoOrdenCompraDTO?.id === 3 || OC.estadoOrdenCompraDTO?.id === 4}
                         >
                           {OC.estadoOrdenCompraDTO?.id === 1 ? "Enviada" :
                            OC.estadoOrdenCompraDTO?.id === 2 ? "Finalizar" :
-                           "Editar"}
+                           "Estado"}
                         </Button>
                       </td>
                       <td>
@@ -291,9 +302,21 @@ const OrdenCompraTable = () => {
                           variant="danger"
                           size="sm"
                           onClick={() => handleCancelarOrden(OC)}
-                          disabled={isLoading}
+                          disabled={isLoading || OC.estadoOrdenCompraDTO?.id === 3 || OC.estadoOrdenCompraDTO?.id === 4}
                         >
                           Cancelar
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          onClick={() =>
+                            handleClick("Editar Orden de Compra", OC, ModalType.UPDATE, true)
+                          }
+                          disabled={isLoading || OC.estadoOrdenCompraDTO?.id !== 1}
+                        >
+                          Editar
                         </Button>
                       </td>
                     </tr>
@@ -314,9 +337,9 @@ const OrdenCompraTable = () => {
           orden={OrdenCompra}
           title={title}
           refreshData={setRefreshData}
-          handleOrdenPendiente={handleOrdenPendiente}
-          handleOrdenEnProceso={handleOrdenEnProceso}
-          handleOrdenFinalizada={handleOrdenFinalizada}
+          handleOrdenPendiente={modalType === ModalType.UPDATE && title.includes("Editar") ? undefined : handleOrdenPendiente}
+          handleOrdenEnProceso={modalType === ModalType.UPDATE && title.includes("Editar") ? undefined : handleOrdenEnProceso}
+          handleOrdenFinalizada={modalType === ModalType.UPDATE && title.includes("Editar") ? undefined : handleOrdenFinalizada}
         />
       )}
     </div>
