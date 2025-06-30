@@ -170,7 +170,15 @@ const ArticuloTable = () => {
             <input
               type="checkbox"
               checked={filtroFaltantes}
-              onChange={() => setFiltroFaltantes((v) => !v)}
+              onChange={async () => {
+                const nuevoValor = !filtroFaltantes;
+                setFiltroFaltantes(nuevoValor);
+                if (nuevoValor) {
+                  await handleMostrarFaltantes();
+                } else {
+                  handleMostrarTodos();
+                }
+              }}
             />
             Artículos faltantes
           </label>
