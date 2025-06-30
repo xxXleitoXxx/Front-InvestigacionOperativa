@@ -119,26 +119,26 @@ const ArticuloTable = () => {
   // Filtrado local
   const articulosFiltrados = articulos.filter((art) => {
     let pasa = true;
-    
     // Filtro de artículos activos (no dados de baja)
     if (filtroActivos) {
       pasa = pasa && (!art.fechaHoraBajaArt || art.fechaHoraBajaArt.trim() === "");
     }
-    
     // Filtros de stock
-    if (filtroFaltantes && filtroAReponer) {
-      pasa = pasa && (art.stock === 0 || art.stock < art.stockSeguridad);
-    } else if (filtroFaltantes) {
-      pasa = pasa && art.stock === 0;
-    } else if (filtroAReponer) {
-      pasa = pasa && art.stock < art.stockSeguridad;
+    if (tablaModo === 'areponer') {
+      // No aplicar filtroAReponer local, ya que los datos ya vienen filtrados del backend
+    } else {
+      if (filtroFaltantes && filtroAReponer) {
+        pasa = pasa && (art.stock === 0 || art.stock < art.stockSeguridad);
+      } else if (filtroFaltantes) {
+        pasa = pasa && art.stock === 0;
+      } else if (filtroAReponer) {
+        pasa = pasa && art.stock < art.stockSeguridad;
+      }
     }
-    
     // Filtro de artículos dados de baja
     if (filtroDadoDeBaja) {
       pasa = pasa && art.fechaHoraBajaArt != null;
     }
-    
     return pasa;
   });
 
