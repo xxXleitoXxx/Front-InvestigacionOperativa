@@ -124,8 +124,8 @@ const ArticuloTable = () => {
       pasa = pasa && (!art.fechaHoraBajaArt || art.fechaHoraBajaArt.trim() === "");
     }
     // Filtros de stock
-    if (tablaModo === 'areponer') {
-      // No aplicar filtroAReponer local, ya que los datos ya vienen filtrados del backend
+    if (tablaModo === 'areponer' || tablaModo === 'faltantes') {
+      // No aplicar filtroAReponer ni filtroFaltantes local, ya que los datos ya vienen filtrados del backend
     } else {
       if (filtroFaltantes && filtroAReponer) {
         pasa = pasa && (art.stock === 0 || art.stock < art.stockSeguridad);
