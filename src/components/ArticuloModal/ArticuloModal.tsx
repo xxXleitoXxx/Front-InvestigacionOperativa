@@ -195,26 +195,6 @@ const ArticuloModal = ({
             </Button>
           </Modal.Footer>
         </Modal>
-      ) : modalType === ModalType.ALTA ? (
-        <Modal show={show} onHide={onHide} centered backdrop="static">
-          <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>
-              ¿Está seguro que desea dar de Alta el artículo? <br />
-              <strong>{art.nomArt}</strong>
-            </p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={onHide}>
-              Cancelar
-            </Button>
-            <Button variant="primary" onClick={handleAltaLogica}>
-              Dar de alta
-            </Button>
-          </Modal.Footer>
-        </Modal>
       ) : (
         <Modal
           show={show}

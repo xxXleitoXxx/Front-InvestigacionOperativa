@@ -256,24 +256,13 @@ const ArticuloTable = () => {
                     }
                   />
                 </td>
-                {art.fechaHoraBajaArt == null && (
-                  <td>
-                    <DeleteButton
-                      onClick={() =>
-                        handleClick("Borrar Artículo", art, ModalType.DELETE)
-                      }
-                    />
-                  </td>
-                )}
-                {art.fechaHoraBajaArt != null && (
-                  <td>
-                    <ButtonAlta
-                      onClick={() =>
-                        handleClick("Dar de Alta Artículo", art, ModalType.ALTA)
-                      }
-                    />
-                  </td>
-                )}
+                <td>
+                  <DeleteButton
+                    onClick={() =>
+                      handleClick("Borrar Artículo", art, ModalType.DELETE)
+                    }
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

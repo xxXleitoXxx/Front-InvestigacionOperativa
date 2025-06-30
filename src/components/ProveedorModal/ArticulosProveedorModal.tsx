@@ -67,6 +67,7 @@ const ArticulosProveedorModal = ({
                 <th>Stock</th>
                 <th>Stock Seguridad</th>
                 <th>Descripción</th>
+                <th>Predeterminado</th>
               </tr>
             </thead>
             <tbody>
@@ -78,6 +79,13 @@ const ArticulosProveedorModal = ({
                   <td>{articulo.stock}</td>
                   <td>{articulo.stockSeguridad}</td>
                   <td>{articulo.descripcionArt}</td>
+                  <td>
+                    {articulo.proveedorDTO && articulo.proveedorDTO.id === proveedor.id ? (
+                      <span className="text-success fw-bold">Predeterminado</span>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
