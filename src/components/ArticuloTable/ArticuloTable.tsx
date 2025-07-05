@@ -10,6 +10,7 @@ import { ListButton } from "../ListButton/ListButton";
 import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import { ArticuloService } from "../../services/ArticuloSevice";
 import { ButtonAlta } from "../ButtonAlta/ButtonAlta";
+import "./ArticuloTable.css";
 
 const ArticuloTable = () => {
   // Constante para inicializar un artículo por defecto y evitar el undefined
@@ -148,10 +149,14 @@ const ArticuloTable = () => {
   });
 
   return (
-    <div>
-      <h1>Tabla Artículos</h1>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+    <div className="articulo-table-container">
+      <div className="page-header">
+        <div className="page-title">
+          <h1>📦 Gestión de Artículos</h1>
+          <p className="page-subtitle">Administra tu inventario de manera eficiente</p>
+        </div>
         <Button
+          className="btn btn-primary btn-add"
           onClick={() =>
             handleClick(
               "Añadir Artículo",
@@ -160,104 +165,136 @@ const ArticuloTable = () => {
             )
           }
         >
+          <span className="btn-icon">+</span>
           Nuevo Artículo
         </Button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      </div>
+
+      <div className="filters-section">
+        <div className="filters-container">
           <Button
+            className={`filter-btn ${filtroActivo === 'todos' ? 'active' : ''}`}
             variant={filtroActivo === 'todos' ? 'primary' : 'outline-primary'}
             onClick={handleMostrarTodos}
             disabled={isLoadingFiltro}
           >
-            Mostrar todos
+            📋 Todos
           </Button>
           <Button
+            className={`filter-btn ${filtroActivo === 'activos' ? 'active' : ''}`}
             variant={filtroActivo === 'activos' ? 'primary' : 'outline-primary'}
             onClick={handleMostrarActivos}
           >
-            Artículos activos
+            ✅ Activos
           </Button>
           <Button
+            className={`filter-btn ${filtroActivo === 'dadosDeBaja' ? 'active' : ''}`}
             variant={filtroActivo === 'dadosDeBaja' ? 'primary' : 'outline-primary'}
             onClick={handleMostrarDadosDeBaja}
           >
-            Artículos dados de baja
+            🗑️ Dados de Baja
           </Button>
           <Button
+            className={`filter-btn ${filtroActivo === 'faltantes' ? 'active' : ''}`}
             variant={filtroActivo === 'faltantes' ? 'primary' : 'outline-primary'}
             onClick={handleMostrarFaltantes}
             disabled={isLoadingFiltro}
           >
-            Artículos faltantes
+            ⚠️ Faltantes
           </Button>
           <Button
+            className={`filter-btn ${filtroActivo === 'areponer' ? 'active' : ''}`}
             variant={filtroActivo === 'areponer' ? 'primary' : 'outline-primary'}
             onClick={handleMostrarAReponer}
             disabled={isLoadingFiltro}
           >
-            Artículos a reponer
+            🔄 A Reponer
           </Button>
         </div>
       </div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Código</th>
-              <th>Nombre</th>
-              <th>Precio Venta</th>
-              <th>Descripción</th>
-              <th>Stock</th>
-              <th>Stock Seguridad</th>
-              <th>Demanda Diaria</th>
-              <th>Desviación Estándar</th>
-              <th>Proveedor</th>
-              <th>Proveedores</th>
-              <th>Fecha Baja</th>
-              <th>Editar</th>
-              <th>Eliminar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {articulosFiltrados.map((art) => (
-              <tr key={art.id}>
-                <td>{art.id}</td>
-                <td>{art.codArt}</td>
-                <td>{art.nomArt}</td>
-                <td>{art.precioVenta}</td>
-                <td>{art.descripcionArt}</td>
-                <td>{art.stock}</td>
-                <td>{art.stockSeguridad}</td>
-                <td>{art.demandaDiaria}</td>
-                <td>{art.desviacionEstandar}</td>
-                <td>{art.proveedorDTO?.nomProv || "Sin proveedor"}</td>
-                <td>
-                  <ListButton
-                    onClick={() => handleShowProveedores(art)}
-                  />
-                </td>
-                <td>{art.fechaHoraBajaArt || "N/A"}</td>
-                <td>
-                  <EditButton
-                    onClick={() =>
-                      handleClick("Editar artículo", art, ModalType.UPDATE)
-                    }
-                  />
-                </td>
-                <td>
-                  <DeleteButton
-                    onClick={() =>
-                      handleClick("Borrar Artículo", art, ModalType.DELETE)
-                    }
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+
+      {errorFiltro && (
+        <div className="alert alert-danger" role="alert">
+          {errorFiltro}
+        </div>
       )}
+
+      {isLoading ? (
+        <div className="loader-container">
+          <Loader />
+        </div>
+      ) : (
+        <div className="table-container">
+          <Table className="table-modern" striped bordered hover>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Stock Seg.</th>
+                <th>Proveedor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {articulosFiltrados.map((art) => (
+                <tr key={art.id} className="table-row-modern">
+                  <td className="text-center">{art.id}</td>
+                  <td className="text-center">
+                    <span className="code-badge">{art.codArt}</span>
+                  </td>
+                  <td>
+                    <div className="product-info">
+                      <div className="product-name">{art.nomArt}</div>
+                      <div className="product-description">{art.descripcionArt}</div>
+                    </div>
+                  </td>
+                  <td className="text-center">
+                    <span className="price-badge">${art.precioVenta}</span>
+                  </td>
+                  <td className="text-center">
+                    <span className={`stock-badge ${art.stock < art.stockSeguridad ? 'low' : 'normal'}`}>
+                      {art.stock}
+                    </span>
+                  </td>
+                  <td className="text-center">{art.stockSeguridad}</td>
+                  <td className="text-center">
+                    <span className="provider-badge">
+                      {art.proveedorDTO?.nomProv || "Sin proveedor"}
+                    </span>
+                  </td>
+                  <td className="text-center">
+                    <span className={`status-badge ${art.fechaHoraBajaArt ? 'inactive' : 'active'}`}>
+                      {art.fechaHoraBajaArt ? 'Inactivo' : 'Activo'}
+                    </span>
+                  </td>
+                  <td className="text-center">
+                    <div className="action-buttons">
+                      <ListButton
+                        onClick={() => handleShowProveedores(art)}
+                      />
+                      <EditButton
+                        onClick={() =>
+                          handleClick("Editar artículo", art, ModalType.UPDATE)
+                        }
+                      />
+                      <DeleteButton
+                        onClick={() =>
+                          handleClick("Borrar Artículo", art, ModalType.DELETE)
+                        }
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      )}
+
       {showModal && (
         <ArticuloModal
           show={showModal}

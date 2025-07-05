@@ -3,33 +3,39 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 //import NavDropdown from "react-bootstrap/NavDropdown";
 //Van los Cu, aca se redirige el path
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 function Navegacion() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { path: "/maestroArticulos", label: "Maestro Artículos", icon: "📦" },
+    { path: "/ordenCompra", label: "Orden de Compra", icon: "🛒" },
+    { path: "/venta", label: "Ventas", icon: "💰" },
+    { path: "/abmprueba", label: "Proveedores", icon: "🏢" },
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <div>
-      <Navbar expand="lg" className="bg-body-tertiary justify-content-between">
-        <Container>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="d-flex w-100 justify-content-between">
-              <Nav.Link onClick={() => navigate("/maestroArticulos")}>
-                Maestro Articulos
-              </Nav.Link>
-              <Nav.Link onClick={() => navigate("/ordenCompra")}>
-                Orden De Compra
-              </Nav.Link>
-              <Nav.Link onClick={() => navigate("/venta")}>
-                Ventas
-                </Nav.Link>
-              <Nav.Link onClick={() => navigate("/abmprueba")}>
-                Proveedores
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </div>
+    <nav className="navigation-modern">
+      <Container>
+        <Nav className="nav-modern">
+          {navItems.map((item) => (
+            <Nav.Link
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={`nav-item-modern ${isActive(item.path) ? 'active' : ''}`}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+            </Nav.Link>
+          ))}
+        </Nav>
+      </Container>
+    </nav>
   );
 }
+
 export default Navegacion;

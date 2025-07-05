@@ -5,35 +5,226 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite + React + TS</title>
+  <title>Sistema de Gestión de Inventario</title>
   <!--Boostrap Stylesheet-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
     integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous" />
 
-  <!----------------------->
-  <!-- Modo Oscuro-->
-  <button id="theme-toggle" class="btn btn-primary">
-    Alternar Modo Oscuro
-  </button>
-  <!-- Contenido de tu aplicación -->
+  <style>
+    .stats-widget {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
 
-  <script>
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-      const html = document.documentElement;
-      if (html.getAttribute('data-bs-theme') === 'dark') {
-        html.removeAttribute('data-bs-theme');
-      } else {
-        html.setAttribute('data-bs-theme', 'dark');
+    .stats-widget:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .stats-icon {
+      font-size: 18px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .refresh-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(180deg);
+    }
+
+    @media (max-width: 768px) {
+      .stats-widget {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
       }
-    });
-  </script>
-  <!--------------->
+      
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      
+      .stat-value {
+        font-size: 16px;
+      }
+      
+      .stat-label {
+        font-size: 9px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Widget de Estadísticas Rápidas -->
+  <div class="stats-widget" id="stats-widget">
+    <button class="refresh-btn" onclick="refreshStats()" title="Actualizar estadísticas">
+      🔄
+    </button>
+    <div class="stats-header">
+      <span class="stats-icon">📊</span>
+      <span>Dashboard Rápido</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-value" id="total-articulos">0</span>
+        <span class="stat-label">Artículos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stock-bajo">0</span>
+        <span class="stat-label">Stock Bajo</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="proveedores">0</span>
+        <span class="stat-label">Proveedores</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="ventas-hoy">0</span>
+        <span class="stat-label">Ventas Hoy</span>
+      </div>
+    </div>
+  </div>
+
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+
+  <script>
+    // Función para actualizar estadísticas
+    function refreshStats() {
+      // Simular datos de estadísticas (en una aplicación real, estos vendrían de la API)
+      const stats = {
+        totalArticulos: Math.floor(Math.random() * 100) + 50,
+        stockBajo: Math.floor(Math.random() * 20) + 5,
+        proveedores: Math.floor(Math.random() * 15) + 8,
+        ventasHoy: Math.floor(Math.random() * 50) + 10
+      };
+
+      // Actualizar valores con animación
+      animateValue('total-articulos', stats.totalArticulos);
+      animateValue('stock-bajo', stats.stockBajo);
+      animateValue('proveedores', stats.proveedores);
+      animateValue('ventas-hoy', stats.ventasHoy);
+
+      // Efecto visual de actualización
+      const widget = document.getElementById('stats-widget');
+      widget.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        widget.style.transform = 'scale(1)';
+      }, 200);
+    }
+
+    // Función para animar cambios de valores
+    function animateValue(elementId, targetValue) {
+      const element = document.getElementById(elementId);
+      const currentValue = parseInt(element.textContent) || 0;
+      const increment = (targetValue - currentValue) / 20;
+      let current = currentValue;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
+          element.textContent = targetValue;
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current);
+        }
+      }, 50);
+    }
+
+    // Cargar estadísticas iniciales
+    document.addEventListener('DOMContentLoaded', function() {
+      refreshStats();
+      
+      // Actualizar estadísticas cada 5 minutos
+      setInterval(refreshStats, 300000);
+    });
+
+    // Función para ocultar/mostrar el widget con doble clic
+    let clickCount = 0;
+    let clickTimer;
+    
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('#stats-widget')) {
+        clickCount++;
+        clearTimeout(clickTimer);
+        
+        clickTimer = setTimeout(() => {
+          if (clickCount === 2) {
+            const widget = document.getElementById('stats-widget');
+            widget.style.opacity = widget.style.opacity === '0' ? '1' : '0';
+            widget.style.pointerEvents = widget.style.opacity === '0' ? 'none' : 'auto';
+          }
+          clickCount = 0;
+        }, 300);
+      }
+    });
+  </script>
 </body>
 
 </html>

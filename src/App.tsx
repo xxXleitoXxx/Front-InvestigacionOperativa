@@ -6,21 +6,34 @@ import { ToastContainer } from "react-toastify";
 import { Suspense } from "react";
 import Loader from "./components/Loader/Loader";
 import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   return (
-    <>
+    <div className="app-container">
       <BrowserRouter>
-        <ToastContainer />
+        <ToastContainer 
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          toastClassName="toast-modern"
+        />
         <Header />
-        <Container
-          style={{ minHeight: "100vh", minWidth: "100%", padding: "0" }}
-        >
-          <Suspense fallback={<Loader />}>
-            <Aplicacion />
-          </Suspense>
-        </Container>
+        <main className="main-content">
+          <Container fluid className="content-container">
+            <Suspense fallback={<Loader text="Cargando aplicación..." variant="fullscreen" />}>
+              <Aplicacion />
+            </Suspense>
+          </Container>
+        </main>
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 

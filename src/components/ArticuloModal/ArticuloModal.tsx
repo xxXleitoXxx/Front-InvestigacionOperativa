@@ -8,6 +8,7 @@ import { ProveedorService } from "../../services/ProveedorService";
 import type { ArticuloDTO } from "../../types/ArticuloDTO";
 import type { ProveedorDTO } from "../../types/ProveedorDTO";
 import { ArticuloService } from "../../services/ArticuloSevice";
+import "./ArticuloModal.css";
 
 type ArticuloModalProps = {
   show: boolean;
@@ -31,6 +32,7 @@ const ArticuloModal = ({
   const [proveedores, setProveedores] = useState<ProveedorDTO[]>([]);
   const [proveedorSearch, setProveedorSearch] = useState("");
   const [selectedProveedorCod, setSelectedProveedorCod] = useState<string>("");
+  
   /////---------------------------Peticiones--------------------------------////
   //GET proveedores fetch
   useEffect(() => {
@@ -176,21 +178,29 @@ const ArticuloModal = ({
     <>
       {/* depende de la peticion del padre es el modal que se muestra */}
       {modalType === ModalType.DELETE ? (
-        <Modal show={show} onHide={onHide} centered backdrop="static">
-          <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
+        <Modal show={show} onHide={onHide} centered backdrop="static" className="modal-modern">
+          <Modal.Header closeButton className="modal-header-danger">
+            <Modal.Title>
+              <span className="modal-icon">🗑️</span>
+              {title}
+            </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-            <p>
-              ¿Está seguro que desea eliminar el artículo? <br />
-              <strong>{art.nomArt}</strong>
-            </p>
+          <Modal.Body className="modal-body-danger">
+            <div className="delete-confirmation">
+              <div className="delete-icon">⚠️</div>
+              <p className="delete-message">
+                ¿Está seguro que desea eliminar el artículo?
+              </p>
+              <div className="delete-item">
+                <strong>{art.nomArt}</strong>
+              </div>
+            </div>
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={onHide}>
+          <Modal.Footer className="modal-footer-danger">
+            <Button variant="outline-secondary" onClick={onHide} className="btn-cancel">
               Cancelar
             </Button>
-            <Button variant="danger" onClick={handleDelete}>
+            <Button variant="danger" onClick={handleDelete} className="btn-delete">
               Eliminar
             </Button>
           </Modal.Footer>
@@ -201,66 +211,169 @@ const ArticuloModal = ({
           onHide={onHide}
           centered
           backdrop="static"
-          className="modal-xl"
+          className="modal-modern modal-xl"
         >
-          <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
+          <Modal.Header closeButton className="modal-header-form">
+            <Modal.Title>
+              <span className="modal-icon">
+                {modalType === ModalType.CREATE ? "➕" : "✏️"}
+              </span>
+              {title}
+            </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={formik.handleSubmit}>
-              <Form.Group controlId="formCodArt">
-                <Form.Label>Código del Artículo</Form.Label>
-                <Form.Control
-                  name="codArt"
-                  type="text"
-                  value={formik.values.codArt || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={!!(formik.errors.codArt && formik.touched.codArt)}
-                  disabled={modalType !== ModalType.CREATE}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.codArt}
-                </Form.Control.Feedback>
-              </Form.Group>
+          <Modal.Body className="modal-body-form">
+            <Form onSubmit={formik.handleSubmit} className="form-modern">
+              <div className="form-grid">
+                <Form.Group controlId="formCodArt" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">🏷️</span>
+                    Código del Artículo
+                  </Form.Label>
+                  <Form.Control
+                    name="codArt"
+                    type="text"
+                    value={formik.values.codArt || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.codArt && formik.touched.codArt)}
+                    disabled={modalType !== ModalType.CREATE}
+                    className="form-control-modern"
+                    placeholder="Ingrese el código del artículo"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.codArt}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-              <Form.Group controlId="formNomArt">
-                <Form.Label>Nombre del Artículo</Form.Label>
-                <Form.Control
-                  name="nomArt"
-                  type="text"
-                  value={formik.values.nomArt || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={!!(formik.errors.nomArt && formik.touched.nomArt)}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.nomArt}
-                </Form.Control.Feedback>
-              </Form.Group>
+                <Form.Group controlId="formNomArt" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">📦</span>
+                    Nombre del Artículo
+                  </Form.Label>
+                  <Form.Control
+                    name="nomArt"
+                    type="text"
+                    value={formik.values.nomArt || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.nomArt && formik.touched.nomArt)}
+                    className="form-control-modern"
+                    placeholder="Ingrese el nombre del artículo"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.nomArt}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-              <Form.Group controlId="formPrecioVenta">
-                <Form.Label>Precio de Venta</Form.Label>
-                <Form.Control
-                  name="precioVenta"
-                  type="number"
-                  value={formik.values.precioVenta || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={
-                    !!(formik.errors.precioVenta && formik.touched.precioVenta)
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.precioVenta}
-                </Form.Control.Feedback>
-              </Form.Group>
+                <Form.Group controlId="formPrecioVenta" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">💰</span>
+                    Precio de Venta
+                  </Form.Label>
+                  <Form.Control
+                    name="precioVenta"
+                    type="number"
+                    value={formik.values.precioVenta || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={
+                      !!(formik.errors.precioVenta && formik.touched.precioVenta)
+                    }
+                    className="form-control-modern"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.precioVenta}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-              <Form.Group controlId="formDescripcionArt">
-                <Form.Label>Descripción del Artículo</Form.Label>
+                <Form.Group controlId="formStock" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">📊</span>
+                    Stock
+                  </Form.Label>
+                  <Form.Control
+                    name="stock"
+                    type="number"
+                    value={formik.values.stock || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.stock && formik.touched.stock)}
+                    className="form-control-modern"
+                    placeholder="0"
+                    min="0"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.stock}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="formDemandaDiaria" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">📈</span>
+                    Demanda Diaria
+                  </Form.Label>
+                  <Form.Control
+                    name="demandaDiaria"
+                    type="number"
+                    value={formik.values.demandaDiaria || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={
+                      !!(
+                        formik.errors.demandaDiaria &&
+                        formik.touched.demandaDiaria
+                      )
+                    }
+                    className="form-control-modern"
+                    placeholder="1"
+                    min="0.01"
+                    step="0.01"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.demandaDiaria}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="formDesviacionEstandar" className="form-group-modern">
+                  <Form.Label className="form-label-modern">
+                    <span className="label-icon">📊</span>
+                    Desviación Estándar
+                  </Form.Label>
+                  <Form.Control
+                    name="desviacionEstandar"
+                    type="number"
+                    value={formik.values.desviacionEstandar || ""}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={
+                      !!(
+                        formik.errors.desviacionEstandar &&
+                        formik.touched.desviacionEstandar
+                      )
+                    }
+                    className="form-control-modern"
+                    placeholder="1"
+                    min="0.01"
+                    step="0.01"
+                  />
+                  <Form.Control.Feedback type="invalid" className="feedback-modern">
+                    {formik.errors.desviacionEstandar}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </div>
+
+              <Form.Group controlId="formDescripcionArt" className="form-group-modern full-width">
+                <Form.Label className="form-label-modern">
+                  <span className="label-icon">📝</span>
+                  Descripción del Artículo
+                </Form.Label>
                 <Form.Control
                   name="descripcionArt"
-                  type="text"
+                  as="textarea"
+                  rows={3}
                   value={formik.values.descripcionArt || ""}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -270,132 +383,95 @@ const ArticuloModal = ({
                       formik.touched.descripcionArt
                     )
                   }
+                  className="form-control-modern"
+                  placeholder="Ingrese una descripción del artículo"
                 />
-                <Form.Control.Feedback type="invalid">
+                <Form.Control.Feedback type="invalid" className="feedback-modern">
                   {formik.errors.descripcionArt}
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group controlId="formStock">
-                <Form.Label>Stock</Form.Label>
-                <Form.Control
-                  name="stock"
-                  type="number"
-                  value={formik.values.stock || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={!!(formik.errors.stock && formik.touched.stock)}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.stock}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group controlId="formDemandaDiaria">
-                <Form.Label>Demanda Diaria</Form.Label>
-                <Form.Control
-                  name="demandaDiaria"
-                  type="number"
-                  value={formik.values.demandaDiaria || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={
-                    !!(
-                      formik.errors.demandaDiaria &&
-                      formik.touched.demandaDiaria
-                    )
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.demandaDiaria}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group controlId="formDesviacionEstandar">
-                <Form.Label>Desviación Estándar</Form.Label>
-                <Form.Control
-                  name="desviacionEstandar"
-                  type="number"
-                  value={formik.values.desviacionEstandar || ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={
-                    !!(
-                      formik.errors.desviacionEstandar &&
-                      formik.touched.desviacionEstandar
-                    )
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.desviacionEstandar}
-                </Form.Control.Feedback>
-              </Form.Group>
-
               {modalType !== ModalType.CREATE && (
-                <>
-                  <Form.Group controlId="formProveedorSearch">
-                    <Form.Label>Buscar Proveedor</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Buscar proveedor..."
-                      value={proveedorSearch}
-                      onChange={(e) => setProveedorSearch(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="formProveedorElegido">
-                    <Form.Label>Proveedor Predeterminado</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={selectedProveedorCod}
-                      onChange={(e) => {
-                        const proveedorNombre = e.target.value;
-                        setSelectedProveedorCod(proveedorNombre);
-                        
-                        // Si se selecciona un proveedor específico
-                        const selectedProveedor = proveedores.find(
-                          (prov) => prov.nomProv === proveedorNombre
-                        );
-                        formik.setFieldValue(
-                          "proveedorDTO",
-                          selectedProveedor || null
-                        );
-                      }}
-                      isInvalid={
-                        !!(
-                          formik.errors.proveedorDTO && formik.touched.proveedorDTO
-                        )
-                      }
-                    >
-                      <option value="">Seleccione un proveedor</option>
-                      {proveedores
-                        .filter((proveedor) =>
-                          proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
-                        )
-                        .map((proveedor, index) => (
-                          <option
-                            key={`proveedor-${index}`}
-                            value={proveedor.nomProv}
-                          >
-                            {proveedor.nomProv}
-                          </option>
-                        ))}
-                    </Form.Control>
-                    {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
-                      <div style={{ color: "red" }}>Error en el proveedor</div>
-                    )}
-                  </Form.Group>
-                </>
+                <div className="proveedor-section">
+                  <h5 className="section-title">
+                    <span className="section-icon">🏢</span>
+                    Información del Proveedor
+                  </h5>
+                  <div className="form-grid">
+                    <Form.Group controlId="formProveedorSearch" className="form-group-modern">
+                      <Form.Label className="form-label-modern">
+                        <span className="label-icon">🔍</span>
+                        Buscar Proveedor
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Buscar proveedor..."
+                        value={proveedorSearch}
+                        onChange={(e) => setProveedorSearch(e.target.value)}
+                        className="form-control-modern"
+                      />
+                    </Form.Group>
+                    <Form.Group controlId="formProveedorElegido" className="form-group-modern">
+                      <Form.Label className="form-label-modern">
+                        <span className="label-icon">🏢</span>
+                        Proveedor Predeterminado
+                      </Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={selectedProveedorCod}
+                        onChange={(e) => {
+                          const proveedorNombre = e.target.value;
+                          setSelectedProveedorCod(proveedorNombre);
+                          
+                          // Si se selecciona un proveedor específico
+                          const selectedProveedor = proveedores.find(
+                            (prov) => prov.nomProv === proveedorNombre
+                          );
+                          formik.setFieldValue(
+                            "proveedorDTO",
+                            selectedProveedor || null
+                          );
+                        }}
+                        isInvalid={
+                          !!(
+                            formik.errors.proveedorDTO && formik.touched.proveedorDTO
+                          )
+                        }
+                        className="form-control-modern"
+                      >
+                        <option value="">Seleccione un proveedor</option>
+                        {proveedores
+                          .filter((proveedor) =>
+                            proveedor.nomProv.toLowerCase().includes(proveedorSearch.toLowerCase())
+                          )
+                          .map((proveedor, index) => (
+                            <option
+                              key={`proveedor-${index}`}
+                              value={proveedor.nomProv}
+                            >
+                              {proveedor.nomProv}
+                            </option>
+                          ))}
+                      </Form.Control>
+                      {formik.errors.proveedorDTO && formik.touched.proveedorDTO && (
+                        <div className="feedback-modern error">Error en el proveedor</div>
+                      )}
+                    </Form.Group>
+                  </div>
+                </div>
               )}
 
-              <Modal.Footer>
-                <Button variant="secondary" onClick={onHide}>
+              <Modal.Footer className="modal-footer-form">
+                <Button variant="outline-secondary" onClick={onHide} className="btn-cancel">
                   Cancelar
                 </Button>
                 <Button
                   variant="primary"
                   type="submit"
                   disabled={!formik.isValid}
+                  className="btn-save"
                 >
+                  <span className="btn-icon">💾</span>
                   Guardar
                 </Button>
               </Modal.Footer>
